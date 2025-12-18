@@ -1,19 +1,27 @@
 <?php
-
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+use App\Http\Controllers\Etudiant\EtudiantDashboardController;
+use App\Http\Controllers\Etudiant\ModuleController;
+use App\Http\Controllers\Etudiant\SeanceController;
+use App\Http\Controllers\Etudiant\PresenceController;
+use App\Http\Controllers\Etudiant\DocumentController;
+use App\Http\Controllers\Etudiant\AnnonceController;
+use App\Http\Controllers\Etudiant\NotificationController;
+Route::middleware('auth:sanctum')->prefix('etudiant')->group(function () {
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    Route::get('/dashboard', [EtudiantDashboardController::class, 'index']);
+
+    Route::get('/modules', [ModuleController::class, 'index']);
+    Route::get('/modules/{id}', [ModuleController::class, 'show']);
+
+    Route::get('/modules/{id}/seances', [SeanceController::class, 'index']);
+
+    Route::get('/presences', [PresenceController::class, 'index']);
+    Route::post('/presence/{seanceId}', [PresenceController::class, 'store']);
+
+    Route::get('/modules/{id}/documents', [DocumentController::class, 'index']);
+
+    Route::get('/modules/{id}/annonces', [AnnonceController::class, 'index']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
 });

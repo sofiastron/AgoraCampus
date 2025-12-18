@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Etudiant;
 
 use App\Http\Controllers\Controller;
-use App\Models\Presence;
 use App\Models\Seance;
+
 
 class EtudiantDashboardController extends Controller
 {
@@ -28,21 +28,19 @@ class EtudiantDashboardController extends Controller
             ->where('statut', 'absent')
             ->count();
 
-       
         return response()->json([
             'profil' => [
                 'user' => [
-                    'id'    => $user->id,
-                    'nom'   => $user->nom,
-                    'email'=> $user->email,
-                    'photo'=> $user->photo,
-                    'role' => $user->role,
+                    'id'     => $user->id,
+                    'nom'    => $user->nom,
+                    'email'  => $user->email,
+                    'photo'  => $user->photo,
+                    'role'   => $user->role,
                 ],
                 'etudiant' => [
                     'id'     => $etudiant->id,
                     'cne'    => $etudiant->cne,
                     'niveau' => $etudiant->niveau,
-                    
                 ]
             ],
             'stats' => [
