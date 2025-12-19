@@ -13,9 +13,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
-       
+        // Création des utilisateurs
         $user1 = User::firstOrCreate(
-            ['email' => 'ali14@test.com'],
+            ['email' => 'ali1455@test.com'],
             [
                 'nom' => 'Ali',
                 'password' => Hash::make('123456'),
@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $user2 = User::firstOrCreate(
-            ['email' => 'sara61@test.com'],
+            ['email' => 'sara6551@test.com'],
             [
                 'nom' => 'Sara',
                 'password' => Hash::make('123456'),
@@ -40,12 +40,23 @@ class DatabaseSeeder extends Seeder
             ['id' => $user2->id]
         );
 
-      
-        $math = Module::firstOrCreate(['titre' => 'Maths']);
-        $phys = Module::firstOrCreate(['titre' => 'Physique']);
-        $info = Module::firstOrCreate(['titre' => 'Informatique']);
+        // Création des modules avec enseignant_id
+        $math = Module::firstOrCreate(
+            ['titre' => 'Maths'],
+            ['enseignant_id' => $enseignant1->id] // ajout de l'enseignant
+        );
 
-        
+        $phys = Module::firstOrCreate(
+            ['titre' => 'Physique'],
+            ['enseignant_id' => $enseignant1->id]
+        );
+
+        $info = Module::firstOrCreate(
+            ['titre' => 'Informatique'],
+            ['enseignant_id' => $enseignant2->id]
+        );
+
+        // Création des annonces
         Annonce::firstOrCreate([
             'titre' => 'TP n°1',
             'module_id' => $math->id,

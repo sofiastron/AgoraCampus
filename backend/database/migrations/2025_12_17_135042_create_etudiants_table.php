@@ -20,6 +20,7 @@ class CreateEtudiantsTable extends Migration
 
     $table->foreignId('groupe_id')->constrained('groupes');
     $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
+    $table->timestamps();
 });
 
     }

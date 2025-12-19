@@ -21,6 +21,7 @@ class CreateAnnoncesTable extends Migration
 
     $table->foreignId('module_id')->constrained('modules');
     $table->foreignId('enseignant_id')->constrained('enseignants');
+    $table->timestamps();
 });
 
     }

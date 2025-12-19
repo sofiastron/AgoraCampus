@@ -23,15 +23,17 @@ class NotificationController extends Controller
 
         /* notif nouveaux annonces*/
         $annonces = Annonce::whereHas('module.seances.presences', function ($q) use ($etudiant) {
-            $q->where('idEtudiant', $etudiant->id);
+            $q->where('etudiant_id', $etudiant->id);
         })->latest('dateCreation')->take(5)->get();
+        /* c est le faite de trouver au moins une presances pour l etudiant
+         dans les seances du module  pour recuperer les annonces, documents, seances liés a ce module*/
 
         foreach ($annonces as $annonce) {
             $notifications[] = [
                 'type' => 'annonce',
                 'titre' => 'Nouvelle annonce',
                 'message' => $annonce->titre,
-                'date' => $annonce->dateCreation,
+                'date' => $annonce->date_creation,
                 'module' => $annonce->module->titre ?? null,
                 'reference_id' => $annonce->id
             ];
@@ -39,7 +41,7 @@ class NotificationController extends Controller
 
         /*  notif nouveaux document*/
         $documents = Document::whereHas('module.seances.presences', function ($q) use ($etudiant) {
-            $q->where('idEtudiant', $etudiant->id);
+            $q->where('etudiant_id', $etudiant->id);
         })->latest('date_upload')->take(5)->get();
 
         foreach ($documents as $doc) {
@@ -55,7 +57,7 @@ class NotificationController extends Controller
 
         /* notif nouveaux seances*/
         $seances = Seance::whereHas('module.seances.presences', function ($q) use ($etudiant) {
-            $q->where('idEtudiant', $etudiant->id);
+            $q->where('etudiant_id', $etudiant->id);
         })->latest('date')->take(5)->get();
 
         foreach ($seances as $seance) {
@@ -74,14 +76,14 @@ class NotificationController extends Controller
 
         $seancesToday = Seance::whereDate('date', $today)
             ->whereHas('module.seances.presences', function ($q) use ($etudiant) {
-                $q->where('idEtudiant', $etudiant->id);
+                $q->where('etudiant_id', $etudiant->id);
             })->get();
 
         foreach ($seancesToday as $seance) {
             $notifications[] = [
                 'type' => 'alerte',
                 'titre' => 'Séance aujourd’hui',
-                'message' => 'Séance à ' . $seance->heureDebut,
+                'message' => 'Séance à ' . $seance->heure_debut,
                 'date' => $seance->date,
                 'module' => $seance->module->titre ?? null,
                 'reference_id' => $seance->id
@@ -89,7 +91,7 @@ class NotificationController extends Controller
         }
 
         /* notif vous etes abscentes*/
-        $absences = Presence::where('idEtudiant', $etudiant->id)
+        $absences = Presence::where('etudiant_id', $etudiant->id)
             ->where('statut', 'absent')
             ->latest('horodatage')
             ->take(5)

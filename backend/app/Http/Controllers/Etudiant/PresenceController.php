@@ -12,7 +12,7 @@ class PresenceController extends Controller
         $etudiant = auth()->user()->etudiant;
 
         return response()->json(
-            Presence::where('idEtudiant', $etudiant->id)
+            Presence::where('etudiant_id', $etudiant->id)
                 ->with('seance.module')
                 ->get()
         );
@@ -24,8 +24,8 @@ class PresenceController extends Controller
 
         $presence = Presence::updateOrCreate(
             [
-                'idEtudiant' => $etudiant->id,
-                'idSeance' => $seanceId
+                'etudiant_id' => $etudiant->id,
+                'seance_id' => $seanceId
             ],
             [
                 'statut' => 'présent',
