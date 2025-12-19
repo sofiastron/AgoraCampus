@@ -1,36 +1,4 @@
 <template>
-<<<<<<< HEAD
-  <div class="dashboard-layout">
-    <AppSidebar />
-
-    <div class="dashboard-main">
-      <AppHeader />
-
-      <div class="dashboard-content">
-        <h1>Dashboard</h1>
-
-        <div class="stats-grid">
-          <div class="stat-card">
-            <h3>Modules</h3>
-            <p>5</p>
-          </div>
-
-          <div class="stat-card">
-            <h3>Séances</h3>
-            <p>12</p>
-          </div>
-
-          <div class="stat-card">
-            <h3>Présences</h3>
-            <p>320</p>
-          </div>
-        </div>
-
-        <div class="quick-actions">
-          <button>➕ Nouvelle séance</button>
-          <button>📢 Nouvelle annonce</button>
-        </div>
-=======
   <div class="dashboard-container">
     <h1>Dashboard Enseignant</h1>
 
@@ -59,20 +27,14 @@
       <div class="stat-card seances-aujourdhui">
         <h2>Séances Aujourd'hui</h2>
         <p>{{ stats.seancesToday }}</p>
->>>>>>> 3476d389b967ca22dbcdc8f897e5a1b5f0a6b016
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-<<<<<<< HEAD
-import AppSidebar from '../components/AppSidebar.vue'
-import AppHeader from '../components/AppHeader.vue'
-</script>
-=======
 import { ref, onMounted } from 'vue'
-import axios from '../api/axios'  // adapte le chemin si besoin
+import axios from '../api/axios'
 
 const stats = ref({
   totalEtudiants: 0,
@@ -89,9 +51,7 @@ async function fetchStats() {
   error.value = null
   try {
     const response = await axios.get('/teacher/dashboard-stats', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
     Object.assign(stats.value, response.data)
   } catch (err) {
@@ -121,7 +81,7 @@ onMounted(() => {
 }
 
 .stat-card {
-  background-color: #3730a3; /* couleur violet foncé */
+  background-color: #3730a3;
   color: white;
   border-radius: 8px;
   padding: 1.5rem;
@@ -143,15 +103,16 @@ onMounted(() => {
   font-size: 2.5rem;
   font-weight: bold;
 }
+
 .loading {
   font-size: 1.2rem;
   color: #4338ca;
   text-align: center;
 }
+
 .error {
   color: #ff4d4f;
   font-weight: bold;
   text-align: center;
 }
 </style>
->>>>>>> 3476d389b967ca22dbcdc8f897e5a1b5f0a6b016
