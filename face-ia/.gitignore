@@ -1,0 +1,11 @@
+# Ignorer le dossier data (toutes les photos)
+data/
+
+# Ignorer le fichier de modèle encodé
+*.pkl
+
+# Ignorer le cache Python
+__pycache__/
+
+# Ignorer les fichiers de configuration locaux
+.env
