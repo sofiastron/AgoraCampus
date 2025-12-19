@@ -2,10 +2,17 @@
 data/
 
 # Ignorer le fichier de modèle encodé
-*.pkl
+*.pkl        # base de données embeddings
 
 # Ignorer le cache Python
 __pycache__/
+*.pyc
+
+
 
 # Ignorer les fichiers de configuration locaux
 .env
+test/*.jpg
+
+
+*.sqlite
