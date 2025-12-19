@@ -13,7 +13,7 @@ class ModuleController extends Controller
 
         return response()->json(
             Module::whereHas('seances.presences', function ($q) use ($etudiant) {
-                $q->where('idEtudiant', $etudiant->id);
+                $q->where('etudiant_id', $etudiant->id);
             })->with('enseignant.user')->get()
         );
     }

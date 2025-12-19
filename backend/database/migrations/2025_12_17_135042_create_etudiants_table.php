@@ -17,9 +17,9 @@ class CreateEtudiantsTable extends Migration
     $table->id();
     $table->string('cne', 50)->unique();
     $table->string('niveau', 50);
-
+    $table->unsignedBigInteger('user_id')->unique();
     $table->foreignId('groupe_id')->constrained('groupes');
-    $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
+    $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
     $table->timestamps();
 });
 

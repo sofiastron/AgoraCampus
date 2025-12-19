@@ -10,7 +10,7 @@ class DocumentController extends Controller
     public function index($moduleId)
     {
         return response()->json(
-            Document::where('idModule', $moduleId)->get()
+            Document::where('module_id', $moduleId)->get()
         );
     }
 

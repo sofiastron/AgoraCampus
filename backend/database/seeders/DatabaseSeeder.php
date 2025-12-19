@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Module;
 use App\Models\Enseignant;
+use App\Models\Etudiant;
 use App\Models\Annonce;
 use Illuminate\Support\Facades\Hash;
 
@@ -13,84 +14,87 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
-        // Création des utilisateurs
-        $user1 = User::firstOrCreate(
-            ['email' => 'ali1455@test.com'],
-            [
-                'nom' => 'Ali',
-                'password' => Hash::make('123456'),
-                'role' => 'enseignant'
-            ]
-        );
+        // =====================
+        // ENSEIGNANTS
+        // =====================
+        $user1 = User::create([
+            'nom' => 'Ali',
+            'email' => 'ali1455@test.com',
+            'password' => Hash::make('123456'),
+            'role' => 'enseignant'
+        ]);
 
-        $enseignant1 = Enseignant::firstOrCreate(
-            ['id' => $user1->id]
-        );
+        $ens1 = Enseignant::create([
+            'user_id' => $user1->id,
+            'grade' => 'Professeur',
+            'departement' => 'Maths'
+        ]);
 
-        $user2 = User::firstOrCreate(
-            ['email' => 'sara6551@test.com'],
-            [
-                'nom' => 'Sara',
-                'password' => Hash::make('123456'),
-                'role' => 'enseignant'
-            ]
-        );
+        $user2 = User::create([
+            'nom' => 'Sara',
+            'email' => 'sara6551@test.com',
+            'password' => Hash::make('123456'),
+            'role' => 'enseignant'
+        ]);
 
-        $enseignant2 = Enseignant::firstOrCreate(
-            ['id' => $user2->id]
-        );
+        $ens2 = Enseignant::create([
+            'user_id' => $user2->id,
+            'grade' => 'Professeur',
+            'departement' => 'Informatique'
+        ]);
 
-        // Création des modules avec enseignant_id
-        $math = Module::firstOrCreate(
-            ['titre' => 'Maths'],
-            ['enseignant_id' => $enseignant1->id] // ajout de l'enseignant
-        );
+        // =====================
+        // MODULES
+        // =====================
+        $math = Module::create([
+            'titre' => 'Maths',
+            'enseignant_id' => $ens1->id
+        ]);
 
-        $phys = Module::firstOrCreate(
-            ['titre' => 'Physique'],
-            ['enseignant_id' => $enseignant1->id]
-        );
+        $phys = Module::create([
+            'titre' => 'Physique',
+            'enseignant_id' => $ens1->id
+        ]);
 
-        $info = Module::firstOrCreate(
-            ['titre' => 'Informatique'],
-            ['enseignant_id' => $enseignant2->id]
-        );
+        $info = Module::create([
+            'titre' => 'Informatique',
+            'enseignant_id' => $ens2->id
+        ]);
 
-        // Création des annonces
-        Annonce::firstOrCreate([
-            'titre' => 'TP n°1',
+        // =====================
+        // ANNONCES
+        // =====================
+        Annonce::create([
+            'titre' => 'TP Maths',
+            'contenu' => 'TP équations',
+            'date_creation' => now(),
             'module_id' => $math->id,
-            'enseignant_id' => $enseignant1->id
-        ], [
-            'contenu' => 'TP sur les équations',
-            'date_creation' => now()
+            'enseignant_id' => $ens1->id
         ]);
 
-        Annonce::firstOrCreate([
-            'titre' => 'TP n°2',
-            'module_id' => $math->id,
-            'enseignant_id' => $enseignant2->id
-        ], [
-            'contenu' => 'TP sur les dérivées',
-            'date_creation' => now()
-        ]);
-
-        Annonce::firstOrCreate([
-            'titre' => 'TP Physique',
-            'module_id' => $phys->id,
-            'enseignant_id' => $enseignant1->id
-        ], [
-            'contenu' => 'TP sur les forces',
-            'date_creation' => now()
-        ]);
-
-        Annonce::firstOrCreate([
-            'titre' => 'TP Informatique',
+        Annonce::create([
+            'titre' => 'TP Info',
+            'contenu' => 'TP algorithmes',
+            'date_creation' => now(),
             'module_id' => $info->id,
-            'enseignant_id' => $enseignant2->id
-        ], [
-            'contenu' => 'TP sur les algorithmes',
-            'date_creation' => now()
+            'enseignant_id' => $ens2->id
+        ]);
+
+        // =====================
+        // ÉTUDIANT
+        // =====================
+        $userEtudiant = User::create([
+            'nom' => 'Amine',
+            'email' => 'amine123@test.com',
+            'password' => Hash::make('123456'),
+            'role' => 'etudiant'
+        ]);
+
+        Etudiant::create([
+            'user_id' => $userEtudiant->id,
+            'cne' => 'CNE12345678',
+            'niveau' => 'Licence 1',
+            'groupe_id' => 1
         ]);
     }
 }

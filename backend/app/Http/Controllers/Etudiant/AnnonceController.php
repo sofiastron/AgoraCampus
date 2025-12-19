@@ -10,9 +10,9 @@ class AnnonceController extends Controller
     public function index($moduleId)
     {
         return response()->json(
-            Annonce::where('idModule', $moduleId)
+            Annonce::where('module_id', $moduleId)
                 ->with('enseignant.user')
-                ->orderBy('dateCreation', 'desc')
+                ->orderBy('date_creation', 'desc')
                 ->get()
         );
     }

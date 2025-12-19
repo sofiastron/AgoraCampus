@@ -24,7 +24,7 @@ class NotificationController extends Controller
         /* notif nouveaux annonces*/
         $annonces = Annonce::whereHas('module.seances.presences', function ($q) use ($etudiant) {
             $q->where('etudiant_id', $etudiant->id);
-        })->latest('dateCreation')->take(5)->get();
+        })->latest('date_creation')->take(5)->get();
         /* c est le faite de trouver au moins une presances pour l etudiant
          dans les seances du module  pour recuperer les annonces, documents, seances liés a ce module*/
 
