@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Seance extends Model
 {
     protected $fillable = [
-        'date', 'heureDebut', 'heureFin', 'qrCode', 'module_id'
+        'date', 'heure_debut', 'heure_fin', 'qr_code', 'module_id'
     ];
 
     public function presences()

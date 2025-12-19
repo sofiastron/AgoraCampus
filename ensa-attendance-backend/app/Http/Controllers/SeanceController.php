@@ -18,9 +18,19 @@ class SeanceController extends Controller
 
     public function store(Request $request)
     {
+       
+        $validatedData = $request->validate([
+            'date' => 'required|date',
+            'module_id' => 'required|integer|exists:modules,id',
+            'heure_debut' => 'required|date_format:H:i:s',
+            'heure_fin' => 'required|date_format:H:i:s',
+            'qr_code' => 'nullable|string',
+        ]);
+        $seance = Seance::create($validatedData);
+
         return response()->json([
             'success' => true,
-            'seance' => Seance::create($request->all())
+            'seance' => $seance
         ]);
     }
 
@@ -37,4 +47,21 @@ class SeanceController extends Controller
             'qrcode' => $qr
         ]);
     }
+    public function show($id)
+{
+    $seance = Seance::find($id);
+
+    if (!$seance) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Séance non trouvée'
+        ], 404);
+    }
+
+    return response()->json([
+        'success' => true,
+        'seance' => $seance
+    ]);
+}
+
 }

@@ -12,14 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('presences', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    $table->foreignId('etudiant_id')->constrained('etudiants');
-    $table->foreignId('seance_id')->constrained('seances');
+            $table->foreignId('etudiant_id')->constrained('etudiants')->onDelete('cascade');
+            $table->foreignId('seance_id')->constrained('seances')->onDelete('cascade');
 
-    $table->enum('statut', ['présent', 'absent']);
-    $table->dateTime('horodatage');
-});
+            $table->enum('statut', ['présent', 'absent']);
+
+            // horodatage avec valeur par défaut timestamp courant
+            $table->timestamp('horodatage')->useCurrent();
+
+            // Si tu veux, tu peux aussi garder les timestamps Laravel
+            // $table->timestamps();
+        });
     }
 
     /**
