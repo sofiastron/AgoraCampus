@@ -13,6 +13,10 @@ __pycache__/
 # Ignorer les fichiers de configuration locaux
 .env
 test/*.jpg
+test/*.jpeg
+test/*.png
+test/*.bmp
+
 
 
 *.sqlite
