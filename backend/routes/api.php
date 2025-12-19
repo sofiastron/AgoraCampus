@@ -8,8 +8,16 @@ use App\Http\Controllers\Etudiant\PresenceController;
 use App\Http\Controllers\Etudiant\DocumentController;
 use App\Http\Controllers\Etudiant\AnnonceController;
 use App\Http\Controllers\Etudiant\NotificationController;
+use App\Http\Controllers\Auth\AuthController;
+
+
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->prefix('etudiant')->group(function () {
 
+    Route::get('/profile', [AuthController::class, 'profile']);
+    Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/dashboard', [EtudiantDashboardController::class, 'index']);
 
     Route::get('/modules', [ModuleController::class, 'index']);

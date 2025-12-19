@@ -14,14 +14,14 @@ class ModuleController extends Controller
         return response()->json(
             Module::whereHas('seances.presences', function ($q) use ($etudiant) {
                 $q->where('idEtudiant', $etudiant->id);
-            })->with('enseignant.utilisateur')->get()
+            })->with('enseignant.user')->get()
         );
     }
 
     public function show($id)
     {
         return response()->json(
-            Module::with(['enseignant.utilisateur', 'documents', 'annonces'])
+            Module::with(['enseignant.user', 'documents', 'annonces'])
                 ->findOrFail($id)
         );
     }

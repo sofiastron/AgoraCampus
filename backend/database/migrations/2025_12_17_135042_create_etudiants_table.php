@@ -19,7 +19,7 @@ class CreateEtudiantsTable extends Migration
     $table->string('niveau', 50);
 
     $table->foreignId('groupe_id')->constrained('groupes');
-    $table->foreign('id')->references('id')->on('utilisateurs')->onDelete('cascade');
+    $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
 });
 
     }

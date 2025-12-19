@@ -17,7 +17,7 @@ class CreateEnseignantsTable extends Migration
             $table->id();
             $table->string('grade', 100)->nullable();
             $table->string('departement', 100)->nullable();
-            $table->foreign('id')->references('id')->on('utilisateurs')->onDelete('cascade');
+            $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
         });
     
     }

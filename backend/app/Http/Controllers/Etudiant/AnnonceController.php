@@ -11,7 +11,7 @@ class AnnonceController extends Controller
     {
         return response()->json(
             Annonce::where('idModule', $moduleId)
-                ->with('enseignant.utilisateur')
+                ->with('enseignant.user')
                 ->orderBy('dateCreation', 'desc')
                 ->get()
         );
@@ -20,7 +20,7 @@ class AnnonceController extends Controller
     public function show($id)
     {
         return response()->json(
-            Annonce::with('enseignant.utilisateur')->findOrFail($id)
+            Annonce::with('enseignant.user')->findOrFail($id)
         );
     }
 }
