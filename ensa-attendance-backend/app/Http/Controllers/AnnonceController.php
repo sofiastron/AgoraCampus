@@ -16,15 +16,17 @@ class AnnonceController extends Controller
     }
 
     public function store(Request $request)
-    {
-        return response()->json([
-            'success' => true,
-            'annonce' => Annonce::create([
-                'titre' => $request->titre,
-                'description' => $request->description,
-                'dateCreation' => now(),
-                'module_id' => $request->module_id
-            ])
-        ]);
-    }
+{
+    return response()->json([
+        'success' => true,
+        'annonce' => Annonce::create([
+            'titre' => $request->titre,
+            'contenu' => $request->contenu,
+            'date_Creation' => now(),
+            'module_id' => $request->module_id,
+            'enseignant_id' => $request->enseignant_id ?? null,  
+        ])
+    ]);
+}
+
 }
