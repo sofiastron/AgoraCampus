@@ -1,23 +1,32 @@
-import { createRouter, createWebHistory } from "vue-router";
-import TeacherLogin from "../views/TeacherLogin.vue";
-import DashboardPage from "../views/DashboardPage.vue";
-import TeacherModules from "../views/TeacherModules.vue";
-import TeacherSeances from "../views/TeacherSeances.vue";
-import TeacherDocuments from "../views/TeacherDocuments.vue";
-import AnnoncesPage from "../views/AnnoncesPage.vue";
+import { createRouter, createWebHistory } from 'vue-router'
+import TeacherLogin from '../views/TeacherLogin.vue'
+import DashboardPage from '../views/DashboardPage.vue'
 
 const routes = [
-  { path: "/", name: "Login", component: TeacherLogin },
-  { path: "/dashboard", name: "Dashboard", component: DashboardPage},
-  { path: "/modules", name: "Modules", component: TeacherModules },
-  { path: "/seances", name: "Seances", component: TeacherSeances },
-  { path: "/documents", name: "Documents", component: TeacherDocuments },
-  { path: "/annonces", name: "Annonces", component: AnnoncesPage },
-];
+  { path: '/', redirect: '/login' },
+
+  { path: '/login', component: TeacherLogin },
+
+  {
+    path: '/dashboard',
+    component: DashboardPage,
+    meta: { requiresAuth: true }
+  }
+]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
-});
+  routes
+})
 
-export default router;
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+
+  if (to.meta.requiresAuth && !token) {
+    next('/login')
+  } else {
+    next()
+  }
+})
+
+export default router

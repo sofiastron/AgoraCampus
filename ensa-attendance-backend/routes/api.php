@@ -18,6 +18,10 @@ Route::get('/test', function() {
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
+use App\Http\Controllers\DashboardController;
+
+Route::middleware('auth:sanctum')->get('/teacher/dashboard-stats', [DashboardController::class, 'stats']);
+
 
 // Modules
 Route::get('/teacher/modules/{enseignantId}', [ModuleController::class, 'mesModules']);

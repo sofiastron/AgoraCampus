@@ -1,37 +1,51 @@
 <template>
-  <div class="login-page">
-    <h2>Teacher Login</h2>
-    <input v-model="email" placeholder="Email" />
-    <input v-model="mot_de_passe" type="password" placeholder="Mot de passe" />
-    <button @click="login">Se connecter</button>
+  <div class="login-container">
+    <form class="login-card" @submit.prevent="handleLogin">
+      <h2>Connexion Enseignant</h2>
+
+      <input
+        type="email"
+        placeholder="Email"
+        v-model="email"
+        required
+      />
+
+      <input
+        type="password"
+        placeholder="Mot de passe"
+        v-model="password"
+        required
+      />
+
+      <button type="submit" :disabled="auth.loading">
+        {{ auth.loading ? 'Connexion...' : 'Se connecter' }}
+      </button>
+
+      <p v-if="auth.error" class="error">
+        {{ auth.error }}
+      </p>
+    </form>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 
-const router = useRouter()
 const email = ref('')
-const mot_de_passe = ref('')
+const password = ref('')
+const auth = useAuthStore()
+const router = useRouter()
 
-const login = async () => {
-  if (!email.value || !mot_de_passe.value) {
-    alert('Veuillez remplir tous les champs !')
-    return
-  }
+const handleLogin = async () => {
+  await auth.login({
+    email: email.value,
+    password: password.value
+  })
 
-  try {
-    const response = await axios.post('http://localhost:8000/api/login', {
-      email: email.value,
-      mot_de_passe: mot_de_passe.value,
-    })
-
-    localStorage.setItem('teacher', JSON.stringify(response.data))
-    router.push('/teacher/dashboard')
-  } catch (error) {
-    alert(error.response.data.message || 'Erreur lors du login')
+  if (auth.token) {
+    router.push('/dashboard')
   }
 }
 </script>
