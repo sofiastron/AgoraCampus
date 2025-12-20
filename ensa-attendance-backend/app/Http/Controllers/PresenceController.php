@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Presence;
+use App\Models\Etudiant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class PresenceController extends Controller
 {
@@ -30,4 +32,36 @@ class PresenceController extends Controller
             'presence' => $presence
         ]);
     }
+
+public function faceRecognition(Request $request)
+{
+    $request->validate([
+        'image' => 'required|image',
+        'seance_id' => 'required|integer'
+    ]);
+
+    $image = $request->file('image');
+
+    $response = Http::attach(
+        'image',
+        file_get_contents($image->path()),
+        $image->getClientOriginalName()
+    )->post('http://127.0.0.1:5000/recognize');
+
+    if ($response->failed()) {
+        return response()->json([
+            'success' => false,
+            'error' => 'Face-AI unreachable'
+        ], 500);
+    }
+
+    return response()->json([
+        'success' => true,
+        'face_ai_response' => $response->json()
+    ]);
+}
+
+
+
+
 }
