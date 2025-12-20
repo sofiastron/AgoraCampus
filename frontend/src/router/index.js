@@ -1,14 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../views/Login.vue';
-import Dashboard from '../views/Dashboard.vue'; // créer cette vue
+import Dashboard from '../views/Dashboard.vue';
 
 const routes = [
-  { path: '/', name: 'Login', component: Login },
-  { path: '/etudiant/dashboard', name: 'Dashboard', component: Dashboard },
+  {
+    path: '/',
+    name: 'login',
+    component: Login,
+  },
+   {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: Dashboard,
+  },
+  
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 });
 
