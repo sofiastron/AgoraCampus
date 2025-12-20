@@ -26,7 +26,6 @@ class Utilisateur extends Authenticatable
         'remember_token'
     ];
 
-    // 🔑 IMPORTANT : dire à Laravel d'utiliser mot_de_passe
     public function getAuthPassword()
     {
         return $this->mot_de_passe;

@@ -42,6 +42,7 @@ Route::post('/annonces', [AnnonceController::class, 'store']);
 // Présences
 Route::get('presences/seance/{seanceId}', [PresenceController::class, 'presencesSeance']);
 Route::post('presences', [PresenceController::class, 'enregistrerPresence']);
+Route::post('presences/face-recognition', [PresenceController::class, 'faceRecognition']);
 // Documents
 Route::get('/documents/module/{moduleId}', [DocumentController::class, 'documentsModule']);
 Route::post('/documents', [DocumentController::class, 'store']);
