@@ -3,8 +3,8 @@ import api from '../api/axios'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null,
-    token: localStorage.getItem('token'),
+    user: JSON.parse(localStorage.getItem('user')) || null,
+    token: localStorage.getItem('token') || null,
     loading: false,
     error: null
   }),
@@ -21,6 +21,8 @@ export const useAuthStore = defineStore('auth', {
         this.user = res.data.utilisateur
 
         localStorage.setItem('token', this.token)
+        localStorage.setItem('user', JSON.stringify(this.user))
+
       } catch (err) {
         console.error(err)
         this.error = 'Email ou mot de passe incorrect'
@@ -33,6 +35,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
       this.token = null
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
     }
   }
 })

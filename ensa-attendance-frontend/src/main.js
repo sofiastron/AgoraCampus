@@ -8,7 +8,7 @@ const app = createApp(App)
 
 const pinia = createPinia()
 
-app.use(pinia)   // 🔥 AVANT tout composant
+app.use(pinia)  
 app.use(router)
 
 app.mount('#app')
