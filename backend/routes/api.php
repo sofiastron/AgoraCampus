@@ -14,11 +14,17 @@ use App\Http\Controllers\Auth\AuthController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
+
 Route::middleware('auth:sanctum')->prefix('etudiant')->group(function () {
 
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/dashboard', [EtudiantDashboardController::class, 'index']);
+   
+
 
     Route::get('/modules', [ModuleController::class, 'index']);
     Route::get('/modules/{id}', [ModuleController::class, 'show']);

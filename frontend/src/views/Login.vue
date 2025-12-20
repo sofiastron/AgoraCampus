@@ -19,6 +19,9 @@
       <button type="submit">Se connecter</button>
       
     </form>
+    <p>
+  <router-link to="/forgot-password">Mot de passe oublié ?</router-link>
+  </p>
 
     <p v-if="success" style="color: green">{{ success }}</p>
     <p v-if="error" style="color: red">{{ error }}</p>
