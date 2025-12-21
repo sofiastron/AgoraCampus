@@ -13,6 +13,11 @@ const routes = [
   { path: "/seances", name: "Seances", component: TeacherSeances },
   { path: "/documents", name: "Documents", component: TeacherDocuments },
   { path: "/annonces", name: "Annonces", component: AnnoncesPage },
+  {
+  path: '/face-recognition',
+  component: () => import('@/views/FaceRecognition.vue')
+  }
+
 ];
 
 const router = createRouter({

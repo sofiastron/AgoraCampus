@@ -21,6 +21,12 @@
           <span class="icon">{{ item.icon }}</span>
           <span class="text">{{ item.label }}</span>
         </li>
+        <li>
+          <router-link to="/face-recognition">
+            📸 Présence par reconnaissance faciale
+          </router-link>
+
+        </li>
       </ul>
     </nav>
 
