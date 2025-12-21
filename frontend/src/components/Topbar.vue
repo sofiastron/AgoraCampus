@@ -14,7 +14,7 @@
         <option>EN</option>
       </select>
 
-      <!-- Notifications -->
+  
       <div class="notification-wrapper">
         <button class="icon" @click="toggleNotifications">
           🔔
@@ -37,7 +37,7 @@
         </div>
       </div>
 
-      <!-- Profile -->
+
       <div class="profile">
         <img src="https://i.pravatar.cc/40" />
         <span>{{ user.nom }}</span>
@@ -58,7 +58,7 @@ const notifications = ref([])
 const search = ref('')
 const showNotifications = ref(false)
 
-/* Charger le profil et notifications */
+
 onMounted(async () => {
   try {
     const res = await api.get('/etudiant/profile')
@@ -92,7 +92,7 @@ const logout = async () => {
   router.push('/')
 }
 
-/* Recherche */
+
 const searchRequest = () => {
   console.log('Recherche:', search.value)
 }
