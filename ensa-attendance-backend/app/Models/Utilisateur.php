@@ -25,7 +25,7 @@ class Utilisateur extends Authenticatable
         'mot_de_passe',
         'remember_token'
     ];
-
+    protected $authPasswordName = 'mot_de_passe';
     public function getAuthPassword()
     {
         return $this->mot_de_passe;

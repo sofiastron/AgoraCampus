@@ -1,7 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <h1>Dashboard Enseignant</h1>
-
+   
     <div v-if="loading" class="loading">Chargement des données...</div>
     <div v-else-if="error" class="error">Erreur : {{ error }}</div>
 
@@ -88,94 +87,164 @@ onMounted(fetchStats)
 
 <style scoped>
 .dashboard-container {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 1rem;
-  font-family: Arial, sans-serif;
-  color: #333;
+  max-width: 1100px;
+  margin: 3rem auto;
+  padding: 2rem;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #0f172a;
+  animation: fadeIn 0.8s ease;
 }
 
+/* TITRE */
 h1 {
   text-align: center;
-  color: #3730a3;
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 2.5rem;
+  background: linear-gradient(90deg, #6366f1, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
+/* GRID STATS */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
 }
 
+/* CARTES */
 .stat-card {
-  background: #3730a3;
-  color: white;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
   padding: 2rem;
-  border-radius: 8px;
   text-align: center;
-  user-select: none;
-  box-shadow: 0 2px 8px rgba(55, 48, 163, 0.3);
-  transition: transform 0.2s ease;
+  box-shadow: 0 20px 45px rgba(99, 102, 241, 0.15);
+  transition: all 0.4s ease;
+  animation: slideUp 0.7s ease forwards;
 }
 
 .stat-card:hover {
-  transform: scale(1.05);
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 30px 70px rgba(99, 102, 241, 0.25);
 }
 
 .stat-card h2 {
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  color: #475569;
+  margin-bottom: 0.6rem;
 }
 
 .stat-card p {
-  font-size: 2.8rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-  margin: 0;
-  color: #fff !important; 
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #6366f1, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
+/* LOADING */
 .loading {
-  font-size: 1.2rem;
-  color: #4338ca;
+  margin-top: 4rem;
   text-align: center;
-  margin-top: 3rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #6366f1;
+  animation: pulse 1.4s infinite;
 }
 
+/* ERREUR */
 .error {
-  color: #ff4d4f;
-  font-weight: bold;
   text-align: center;
   margin-top: 3rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ef4444;
 }
 
+/* SECTION AUJOURD'HUI */
 .today-section {
-  margin-top: 3rem;
+  margin-top: 4rem;
+  animation: fadeIn 1s ease;
 }
 
+.today-section h2 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+}
+
+/* LISTE SEANCES */
 .seance-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.4rem;
 }
 
 .seance-card {
-  background: #4338ca;
+  background: linear-gradient(135deg, #6366f1, #22d3ee);
   color: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 6px rgba(55, 48, 163, 0.7);
-  transition: transform 0.2s ease;
-}
-.seance-card:hover {
-  transform: scale(1.05);
+  padding: 1.4rem;
+  border-radius: 16px;
+  box-shadow: 0 18px 35px rgba(34, 211, 238, 0.35);
+  transition: all 0.35s ease;
+  animation: slideUp 0.6s ease forwards;
 }
 
-.no-seance {
-  margin-top: 1rem;
-  font-weight: bold;
-  color: #999;
-  text-align: center;
+.seance-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 25px 55px rgba(34, 211, 238, 0.5);
 }
+
+.seance-card p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+}
+
+/* AUCUNE SEANCE */
+.no-seance {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
 </style>
