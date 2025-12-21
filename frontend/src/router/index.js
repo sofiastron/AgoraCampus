@@ -6,18 +6,18 @@ import ResetPassword from '../views/ResetPassword.vue'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 
 const routes = [
-  // Pages publiques
+
   { path: '/', component: Login },
   { path: '/forgot-password', component: ForgotPassword },
   { path: '/reset-password', component: ResetPassword },
 
-  // Pages avec layout
   {
-    path: '/',
+    path: '/dashboard',
     component: DashboardLayout,
+    meta: { requiresAuth: true },
     children: [
       {
-        path: 'dashboard',
+        path: '',
         component: Dashboard
       }
     ]
@@ -27,6 +27,22 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+
+  if (to.meta.requiresAuth && !token) {
+    return next('/')
+  }
+
+  // Si connecter → pas retourner au login
+  if ((to.path === '/' || to.path === '/login') && token) {
+    return next('/dashboard')
+  }
+
+  next()
 })
 
 export default router

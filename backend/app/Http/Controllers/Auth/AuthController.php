@@ -13,28 +13,7 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $request->validate([
-            'nom' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'role' => 'in:etudiant,enseignant,administrateur'
-        ]);
-
-        $user = User::create([
-    'nom' => $request->nom,
-    'email' => $request->email,
-    'password' => Hash::make($request->password),
-    'role' => $request->role ?? 'etudiant',
-]);
-
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Inscription réussie',
-            'user' => $user,
-            'token' => $token
-        ], 201);
+      //par admin only
     }
 
    
@@ -77,6 +56,8 @@ class AuthController extends Controller
             'message' => 'Déconnexion réussie'
         ]);
     }
+
+
     public function sendResetLinkEmail(Request $request)
 {
     $request->validate([
@@ -91,6 +72,7 @@ class AuthController extends Controller
         ? response()->json(['message' => 'Email de réinitialisation envoyé'])
         : response()->json(['message' => 'Erreur lors de l’envoi'], 500);
 }
+
 public function resetPassword(Request $request)
 {
     $request->validate([
