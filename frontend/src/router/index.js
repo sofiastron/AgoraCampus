@@ -5,6 +5,7 @@ import ForgotPassword from '../views/ForgotPassword.vue'
 import ResetPassword from '../views/ResetPassword.vue'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import Courses from '@/views/Courses.vue'
+import ScanQR from '@/views/ScanQR.vue'
 const routes = [
 
   { path: '/', component: Login },
@@ -19,6 +20,17 @@ const routes = [
       {
         path: '',
         component: Dashboard
+      }
+    ]
+  },
+    {
+    path: '/ScanQR',
+    component: DashboardLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        component: ScanQR
       }
     ]
   },

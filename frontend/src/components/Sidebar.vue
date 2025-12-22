@@ -5,7 +5,7 @@
     <nav>
       <router-link to="/dashboard"> Dashboard</router-link>
       <router-link to="/courses"> Mes cours</router-link>
-      <router-link to="/scan-qr"> Scanner QR</router-link>
+      <router-link to="/ScanQR"> Scanner QR</router-link>
       <router-link to="/calendrier"> Calendrier</router-link>
       <router-link to="/messages"> Messages</router-link>
       <router-link to="/profile">Profil</router-link>
