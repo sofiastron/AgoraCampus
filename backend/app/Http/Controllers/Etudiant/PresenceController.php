@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Etudiant;
 
 use App\Http\Controllers\Controller;
 use App\Models\Presence;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
+
 class PresenceController extends Controller
 {
     public function index()
@@ -18,8 +20,12 @@ class PresenceController extends Controller
         );
     }
 
-    public function store($seanceId)
+    public function store(Request $request, $seanceId)
     {
+        $request->validate([
+            'statut' => 'required|in:présent,absent'
+        ]);
+
         $etudiant = auth()->user()->etudiant;
 
         $presence = Presence::updateOrCreate(
@@ -28,13 +34,13 @@ class PresenceController extends Controller
                 'seance_id' => $seanceId
             ],
             [
-                'statut' => 'présent',
+                'statut' => $request->statut,
                 'horodatage' => Carbon::now()
             ]
         );
 
         return response()->json([
-            'message' => 'Présence enregistrée',
+            'message' => 'Statut enregistré',
             'data' => $presence
         ]);
     }

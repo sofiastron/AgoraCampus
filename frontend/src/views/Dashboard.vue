@@ -32,7 +32,7 @@
         <div v-for="a in annonces" :key="a.id" class="annonce">
           <strong>{{ a.titre }}</strong>
           <p>{{ a.contenu }}</p>
-          <small>{{ a.enseignant.user.nom }}</small>
+          <small>Par {{ a.enseignant.user.nom }}</small>
         </div>
       </div>
     </div>
@@ -42,7 +42,7 @@
       <h3>Séances aujourd’hui</h3>
       <ul>
         <li v-for="s in seancesAujourdHui" :key="s.id">
-          {{ s.module.titre }} ({{ s.seance.heure_debut }})
+          {{ s.module.titre }} ({{ s.heure_debut }})
         </li>
       </ul>
     </div>
@@ -55,19 +55,26 @@ import axios from '@/axios'
 import Chart from 'chart.js/auto'
 
 const chartCanvas = ref(null)
+let chartInstance = null
 
 const profil = reactive({ nom: '' })
 const stats = reactive({ presences: 0, absences: 0 })
+
 const annonces = ref([])
 const presences = ref([])
 const seancesAujourdHui = ref([])
 
-// Taux de présence
+/* =======================
+   Taux de présence
+======================= */
 const tauxPresence = computed(() => {
   const total = stats.presences + stats.absences
   return total ? Math.round((stats.presences / total) * 100) : 0
 })
 
+/* =======================
+   Chargement Dashboard
+======================= */
 onMounted(async () => {
   // Dashboard
   const dash = await axios.get('/etudiant/dashboard')
@@ -75,43 +82,58 @@ onMounted(async () => {
   stats.presences = dash.data.stats.presences
   stats.absences = dash.data.stats.absences
 
-  // Présences (pour graphe + séances)
+  // Présences (graphe)
   const pres = await axios.get('/etudiant/presences')
   presences.value = pres.data
 
-  // Annonces (exemple module 1)
-  const ann = await axios.get('/etudiant/annonces/1')
+  // Annonces (module 1 exemple)
+  const ann = await axios.get('/etudiant/modules/1/annonces')
   annonces.value = ann.data
 
   buildChart()
 })
 
+/* =======================
+   Graphe Absences / Module
+======================= */
 function buildChart() {
   const currentMonth = new Date().getMonth()
-
   const absencesParModule = {}
 
   presences.value.forEach(p => {
+    if (!p.seance || !p.seance.module) return
+
     const date = new Date(p.horodatage)
+
     if (
       p.statut === 'absent' &&
       date.getMonth() === currentMonth
     ) {
       const module = p.seance.module.titre
-      absencesParModule[module] = (absencesParModule[module] || 0) + 1
+      absencesParModule[module] =
+        (absencesParModule[module] || 0) + 1
     }
   })
 
-  new Chart(chartCanvas.value, {
+  if (chartInstance) chartInstance.destroy()
+
+  chartInstance = new Chart(chartCanvas.value, {
     type: 'bar',
     data: {
       labels: Object.keys(absencesParModule),
       datasets: [
         {
           label: 'Absences',
-          data: Object.values(absencesParModule)
+          data: Object.values(absencesParModule),
+          backgroundColor: '#ef4444'
         }
       ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      }
     }
   })
 }
