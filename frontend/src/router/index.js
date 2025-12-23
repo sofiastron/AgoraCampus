@@ -34,6 +34,17 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/Profile',
+    component: DashboardLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/Profile.vue')
+      }
+    ]
+  },
    {
     path: '/courses',
     component: DashboardLayout,

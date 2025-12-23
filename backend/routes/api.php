@@ -21,6 +21,7 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::middleware('auth:sanctum')->prefix('etudiant')->group(function () {
 
     Route::get('/profile', [AuthController::class, 'profile']);
+    Route::put('/profile/change-password', [AuthController::class, 'changePassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/dashboard', [EtudiantDashboardController::class, 'index']);
    

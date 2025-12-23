@@ -42,12 +42,40 @@ class AuthController extends Controller
     }
 
     
-    public function profile(Request $request)
-    {
-        return response()->json($request->user());
+   public function profile(Request $request)
+{
+    $user = $request->user(); 
+    return response()->json([
+        'nom' => $user->nom,
+        'email' => $user->email,
+        'photo' => $user->photo, 
+    ]);
+}
+public function changePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'new_password' => 'required|min:6|confirmed', 
+    ]);
+
+    $user = $request->user();
+
+   
+    if (!Hash::check($request->current_password, $user->password)) {
+        return response()->json([
+            'message' => 'Mot de passe actuel incorrect'
+        ], 400);
     }
 
-    
+  
+    $user->password = Hash::make($request->new_password);
+    $user->save();
+
+    return response()->json([
+        'message' => 'Mot de passe mis à jour avec succès'
+    ]);
+}
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
