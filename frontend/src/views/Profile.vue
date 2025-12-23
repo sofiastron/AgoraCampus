@@ -1,9 +1,17 @@
 <template>
   <div class="profile-container">
     <div class="profile-card">
-      <!-- Photo -->
+      
+      <!-- Photo de profil avec upload -->
       <div class="profile-photo">
-        <img :src="user.photo || defaultPhoto" alt="Photo de profil" />
+        <img :src="previewPhoto || user.photo || defaultPhoto" alt="Photo de profil" />
+        <input type="file" @change="handlePhotoChange" accept="image/*" />
+        <button v-if="selectedPhoto" @click="uploadPhoto" :disabled="loadingPhoto">
+          {{ loadingPhoto ? 'Envoi...' : 'Mettre à jour la photo' }}
+        </button>
+        <p v-if="photoMessage" :class="{'success-msg': photoSuccess, 'error-msg': !photoSuccess}">
+          {{ photoMessage }}
+        </p>
       </div>
 
       <!-- Infos utilisateur -->
@@ -52,13 +60,19 @@ export default {
   data() {
     return {
       user: {},
-      defaultPhoto: "https://i.pravatar.cc/40", 
+      defaultPhoto: "https://i.pravatar.cc/150",
       current_password: "",
       new_password: "",
       new_password_confirmation: "",
       message: "",
       success: false,
       loading: false,
+      // Pour la photo
+      selectedPhoto: null,
+      previewPhoto: null,
+      loadingPhoto: false,
+      photoMessage: "",
+      photoSuccess: false,
     };
   },
   mounted() {
@@ -73,6 +87,8 @@ export default {
         console.error("Erreur récupération profil", err);
       }
     },
+
+    // Gestion mot de passe
     async changePassword() {
       this.loading = true;
       this.message = "";
@@ -93,6 +109,41 @@ export default {
         this.success = false;
       } finally {
         this.loading = false;
+      }
+    },
+
+    // Gestion photo
+    handlePhotoChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.selectedPhoto = file;
+        this.previewPhoto = URL.createObjectURL(file);
+      }
+    },
+
+    async uploadPhoto() {
+      if (!this.selectedPhoto) return;
+      this.loadingPhoto = true;
+      this.photoMessage = "";
+      try {
+        const formData = new FormData();
+        formData.append("photo", this.selectedPhoto);
+
+        const res = await axios.post("/etudiant/profile/photo", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        this.user.photo = res.data.photo; // nouvelle photo depuis serveur
+        this.photoMessage = "Photo mise à jour avec succès !";
+        this.photoSuccess = true;
+        this.selectedPhoto = null;
+        this.previewPhoto = null;
+      } catch (err) {
+        this.photoMessage =
+          err.response?.data?.message || "Erreur lors de l'envoi de la photo";
+        this.photoSuccess = false;
+      } finally {
+        this.loadingPhoto = false;
       }
     },
   },
@@ -117,12 +168,38 @@ export default {
   text-align: center;
 }
 
+.profile-photo {
+  position: relative;
+  margin-bottom: 20px;
+}
+
 .profile-photo img {
   width: 120px;
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
+  border: 2px solid #667eea;
+}
+
+.profile-photo input[type="file"] {
+  display: block;
+  margin: 0 auto 10px;
+}
+
+.profile-photo button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #667eea;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-photo button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .profile-info h2 {

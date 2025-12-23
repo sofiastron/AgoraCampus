@@ -14,7 +14,6 @@
         <option>EN</option>
       </select>
 
-  
       <div class="notification-wrapper">
         <button class="icon" @click="toggleNotifications">
           🔔
@@ -37,9 +36,8 @@
         </div>
       </div>
 
-
       <div class="profile">
-        <img src="https://i.pravatar.cc/40" />
+        <img :src="user.photo ? user.photo + '?t=' + timestamp : defaultPhoto" />
         <span>{{ user.nom }}</span>
         <button @click="logout">⎋</button>
       </div>
@@ -57,17 +55,26 @@ const user = ref({})
 const notifications = ref([])
 const search = ref('')
 const showNotifications = ref(false)
-
+const timestamp = ref(Date.now()) // pour forcer rechargement image
+const defaultPhoto = 'https://i.pravatar.cc/40'
 
 onMounted(async () => {
   try {
-    const res = await api.get('/etudiant/profile')
-    user.value = res.data
-    loadNotifications()
+    await loadProfile()
+    await loadNotifications()
   } catch (e) {
     logout()
   }
 })
+
+const loadProfile = async () => {
+  try {
+    const res = await api.get('/etudiant/profile')
+    user.value = res.data
+  } catch (err) {
+    console.error('Erreur profil', err)
+  }
+}
 
 const loadNotifications = async () => {
   try {
@@ -78,7 +85,6 @@ const loadNotifications = async () => {
   }
 }
 
-
 const toggleNotifications = () => {
   showNotifications.value = !showNotifications.value
 }
@@ -87,14 +93,18 @@ const logout = async () => {
   try {
     await api.post('/etudiant/logout')
   } catch (e) {}
-
   localStorage.removeItem('token')
   router.push('/')
 }
 
-
 const searchRequest = () => {
   console.log('Recherche:', search.value)
+}
+
+// Fonction à appeler après upload photo pour mettre à jour la top bar
+const refreshUserPhoto = (newPhotoUrl) => {
+  user.value.photo = newPhotoUrl
+  timestamp.value = Date.now() // forcer rafraîchissement
 }
 </script>
 
@@ -139,7 +149,6 @@ const searchRequest = () => {
   border-radius: 50%;
 }
 
-/* Notification dropdown */
 .notification-wrapper {
   position: relative;
 }
@@ -179,5 +188,8 @@ const searchRequest = () => {
 
 .profile img {
   border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
 }
 </style>

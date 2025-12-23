@@ -121,6 +121,26 @@ public function resetPassword(Request $request)
         ? response()->json(['message' => 'Mot de passe réinitialisé avec succès'])
         : response()->json(['message' => 'Token invalide ou expiré'], 400);
 }
+public function updatePhoto(Request $request)
+{
+    $request->validate([
+        'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // max 2 Mo
+    ]);
+
+    $user = auth()->user();
+
+    if ($request->hasFile('photo')) {
+        $file = $request->file('photo');
+        $filename = time().'_'.$file->getClientOriginalName();
+        $file->storeAs('public/photos', $filename);
+        $user->photo = asset('storage/photos/'.$filename);
+        $user->save();
+
+        return response()->json(['photo' => $user->photo]);
+    }
+
+    return response()->json(['message' => 'Aucune photo sélectionnée'], 400);
+}
 
 
 }
