@@ -1,8 +1,7 @@
 <template>
   <div class="profile-container">
     <div class="profile-card">
-      
-      <!-- Photo de profil avec upload -->
+      <!-- Photo de profil -->
       <div class="profile-photo">
         <img :src="previewPhoto || user.photo || defaultPhoto" alt="Photo de profil" />
         <input type="file" @change="handlePhotoChange" accept="image/*" />
@@ -17,33 +16,38 @@
       <!-- Infos utilisateur -->
       <div class="profile-info">
         <h2>{{ user.nom }}</h2>
-        <p>{{ user.email }}</p>
+        <p><strong>Email :</strong> {{ user.email }}</p>
+        <p v-if="user.cne"><strong>CNE :</strong> {{ user.cne }}</p>
+        <p v-if="user.filiere"><strong>Filière :</strong> {{ user.filiere }}</p>
+        <p v-if="user.niveau"><strong>Niveau :</strong> {{ user.niveau }}</p>
+        <p v-if="user.telephone"><strong>Téléphone :</strong> {{ user.telephone }}</p>
       </div>
 
+      <!-- Bouton pour afficher le formulaire mot de passe -->
+      <button class="btn-edit-pass" @click="showPasswordForm = !showPasswordForm">
+        {{ showPasswordForm ? 'Annuler' : 'Modifier le mot de passe' }}
+      </button>
+
       <!-- Formulaire de changement de mot de passe -->
-      <div class="password-change">
+      <div v-if="showPasswordForm" class="password-change">
         <h3>Changer le mot de passe</h3>
         <form @submit.prevent="changePassword">
           <div class="form-group">
             <label>Mot de passe actuel</label>
             <input type="password" v-model="current_password" required />
           </div>
-
           <div class="form-group">
             <label>Nouveau mot de passe</label>
             <input type="password" v-model="new_password" required />
           </div>
-
           <div class="form-group">
             <label>Confirmer le nouveau mot de passe</label>
             <input type="password" v-model="new_password_confirmation" required />
           </div>
-
           <button type="submit" :disabled="loading">
             {{ loading ? 'Enregistrement...' : 'Changer le mot de passe' }}
           </button>
         </form>
-
         <p v-if="message" :class="{'success-msg': success, 'error-msg': !success}">
           {{ message }}
         </p>
@@ -67,12 +71,12 @@ export default {
       message: "",
       success: false,
       loading: false,
-      // Pour la photo
       selectedPhoto: null,
       previewPhoto: null,
       loadingPhoto: false,
       photoMessage: "",
       photoSuccess: false,
+      showPasswordForm: false, // pour afficher ou cacher le formulaire mot de passe
     };
   },
   mounted() {
@@ -88,7 +92,6 @@ export default {
       }
     },
 
-    // Gestion mot de passe
     async changePassword() {
       this.loading = true;
       this.message = "";
@@ -103,6 +106,7 @@ export default {
         this.current_password = "";
         this.new_password = "";
         this.new_password_confirmation = "";
+        this.showPasswordForm = false;
       } catch (err) {
         this.message =
           err.response?.data?.message || "Erreur lors du changement de mot de passe";
@@ -112,7 +116,6 @@ export default {
       }
     },
 
-    // Gestion photo
     handlePhotoChange(event) {
       const file = event.target.files[0];
       if (file) {
@@ -133,7 +136,7 @@ export default {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
-        this.user.photo = res.data.photo; // nouvelle photo depuis serveur
+        this.user.photo = res.data.photo;
         this.photoMessage = "Photo mise à jour avec succès !";
         this.photoSuccess = true;
         this.selectedPhoto = null;
@@ -154,18 +157,25 @@ export default {
 .profile-container {
   display: flex;
   justify-content: center;
-  padding: 30px;
+  padding: 40px;
   font-family: 'Segoe UI', sans-serif;
+  background: #f4f6f8;
+  min-height: 100vh;
 }
 
 .profile-card {
   background: #fff;
   padding: 30px;
-  border-radius: 16px;
-  max-width: 400px;
+  border-radius: 20px;
+  max-width: 450px;
   width: 100%;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
   text-align: center;
+  transition: transform 0.3s;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
 }
 
 .profile-photo {
@@ -174,12 +184,12 @@ export default {
 }
 
 .profile-photo img {
-  width: 120px;
-  height: 120px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 10px;
-  border: 2px solid #667eea;
+  border: 3px solid #667eea;
 }
 
 .profile-photo input[type="file"] {
@@ -188,33 +198,52 @@ export default {
 }
 
 .profile-photo button {
-  padding: 8px 12px;
+  padding: 8px 15px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #667eea;
   color: #fff;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
-.profile-photo button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.profile-photo button:hover {
+  background: #5563c1;
 }
 
 .profile-info h2 {
   margin: 0;
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 700;
+  color: #333;
 }
 
 .profile-info p {
-  margin: 5px 0 20px;
+  margin: 5px 0;
   color: #555;
+  font-size: 16px;
+}
+
+.btn-edit-pass {
+  margin: 15px 0;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #f6ad55;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-edit-pass:hover {
+  background: #dd6b20;
 }
 
 .password-change {
   text-align: left;
+  margin-top: 15px;
 }
 
 .password-change h3 {
@@ -224,7 +253,7 @@ export default {
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .form-group label {
@@ -236,19 +265,24 @@ export default {
 .form-group input {
   width: 100%;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #ccc;
 }
 
-button {
+button[type="submit"] {
   width: 100%;
   padding: 10px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #667eea;
   color: #fff;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.3s;
+}
+
+button[type="submit"]:hover {
+  background: #5563c1;
 }
 
 button:disabled {
