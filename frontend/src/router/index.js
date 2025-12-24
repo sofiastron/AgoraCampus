@@ -1,17 +1,42 @@
 import { createRouter, createWebHistory } from 'vue-router'
+
+// Pages publiques
 import Login from '../views/Login.vue'
-import Dashboard from '../views/Dashboard.vue'
 import ForgotPassword from '../views/ForgotPassword.vue'
 import ResetPassword from '../views/ResetPassword.vue'
+
+// Layout
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
+
+// Pages protégées
+import Dashboard from '../views/Dashboard.vue'
 import Courses from '@/views/Courses.vue'
 import ScanQR from '@/views/ScanQR.vue'
+import Profile from '@/views/Profile.vue'
+
 const routes = [
+  // ======================
+  // Pages publiques
+  // ======================
+  {
+    path: '/',
+    name: 'Login',
+    component: Login
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPassword
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: ResetPassword
+  },
 
-  { path: '/', component: Login },
-  { path: '/forgot-password', component: ForgotPassword },
-  { path: '/reset-password', component: ResetPassword },
-
+  // ======================
+  // Pages protégées
+  // ======================
   {
     path: '/dashboard',
     component: DashboardLayout,
@@ -19,64 +44,69 @@ const routes = [
     children: [
       {
         path: '',
+        name: 'Dashboard',
         component: Dashboard
       }
     ]
   },
-    {
-    path: '/ScanQR',
-    component: DashboardLayout,
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: '',
-        component: ScanQR
-      }
-    ]
-  },
+
   {
-    path: '/Profile',
-    component: DashboardLayout,
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: '',
-        component: () => import('@/views/Profile.vue')
-      }
-    ]
-  },
-   {
     path: '/courses',
     component: DashboardLayout,
     meta: { requiresAuth: true },
     children: [
       {
         path: '',
+        name: 'Courses',
         component: Courses
       }
     ]
+  },
+
+  {
+    path: '/scan-qr',
+    component: DashboardLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'ScanQR',
+        component: ScanQR
+      }
+    ]
+  },
+
+  {
+    path: '/profile',
+    component: DashboardLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'Profile',
+        component: Profile
+      }
+    ]
   }
-  
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
 })
 
-
+// ======================
+// Navigation Guard
+// ======================
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
 
+  // Route protégée sans token → login
   if (to.meta.requiresAuth && !token) {
     return next('/')
   }
 
-  // Si connecter → pas retourner au login
-  if ((to.path === '/' || to.path === '/login') && token) {
-    return next('/dashboard')
-  }
-
+  // Sinon → continuer
   next()
 })
 
