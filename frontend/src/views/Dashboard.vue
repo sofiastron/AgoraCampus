@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="title">Bienvenue {{ profil.nom }}</h1>
+    <h1 class="title">Bienvenue {{ profil.user.nom }}</h1>
 
     <!-- Cartes stats -->
     <div class="stats">
@@ -20,10 +20,18 @@
       </div>
     </div>
 
+    <!-- Sélection du mois pour le graphe -->
+    <div class="box">
+      <label for="month">Choisir le mois :</label>
+      <select id="month" v-model="selectedMonth" @change="updateChart">
+        <option v-for="m in availableMonths" :key="m" :value="m">{{ m }}</option>
+      </select>
+    </div>
+
     <!-- Graphe + annonces -->
     <div class="grid">
       <div class="box">
-        <h3>Absences par module (ce mois)</h3>
+        <h3>Absences par module</h3>
         <canvas ref="chartCanvas"></canvas>
       </div>
 
@@ -32,7 +40,7 @@
         <div v-for="a in annonces" :key="a.id" class="annonce">
           <strong>{{ a.titre }}</strong>
           <p>{{ a.contenu }}</p>
-          <small>Par {{ a.enseignant.user.nom }}</small>
+          <small>{{ a.enseignant?.user?.nom || a.enseignant?.nom || 'Enseignant inconnu' }}</small>
         </div>
       </div>
     </div>
@@ -57,82 +65,129 @@ import Chart from 'chart.js/auto'
 const chartCanvas = ref(null)
 let chartInstance = null
 
-const profil = reactive({ nom: '' })
+// Données
+const profil = reactive({ user: { nom: '', email: '' } })
 const stats = reactive({ presences: 0, absences: 0 })
-
 const annonces = ref([])
 const presences = ref([])
 const seancesAujourdHui = ref([])
 
-/* =======================
-   Taux de présence
-======================= */
+// Pour graphe
+const selectedMonth = ref('')
+const availableMonths = ref([]) // format 'YYYY-MM'
+
+// Taux de présence
 const tauxPresence = computed(() => {
   const total = stats.presences + stats.absences
   return total ? Math.round((stats.presences / total) * 100) : 0
 })
 
-/* =======================
-   Chargement Dashboard
-======================= */
 onMounted(async () => {
-  // Dashboard
-  const dash = await axios.get('/etudiant/dashboard')
-  profil.nom = dash.data.profil.user.nom
-  stats.presences = dash.data.stats.presences
-  stats.absences = dash.data.stats.absences
+  try {
+    // Dashboard principal
+    const dash = await axios.get('/etudiant/dashboard')
+    profil.user.nom = dash.data.profil.user.nom
+    stats.presences = dash.data.stats.presences
+    stats.absences = dash.data.stats.absences
 
-  // Présences (graphe)
-  const pres = await axios.get('/etudiant/presences')
-  presences.value = pres.data
+    // Présences pour le graphe
+    const pres = await axios.get('/etudiant/presences')
+    presences.value = pres.data
 
-  // Annonces (module 1 exemple)
-  const ann = await axios.get('/etudiant/modules/1/annonces')
-  annonces.value = ann.data
+    // Générer la liste des mois disponibles
+    generateAvailableMonths()
 
-  buildChart()
+    // Choisir par défaut le dernier mois
+    selectedMonth.value = availableMonths.value[availableMonths.value.length - 1]
+
+    // Modules et séances
+    const modulesRes = await axios.get('/etudiant/modules')
+    const today = new Date().toISOString().slice(0, 10)
+    seancesAujourdHui.value = []
+
+    await Promise.all(modulesRes.data.map(async (m) => {
+      const seancesRes = await axios.get(`/etudiant/modules/${m.id}/seances`)
+      seancesRes.data.forEach(s => {
+        if (s.date_seance === today) {
+          seancesAujourdHui.value.push({
+            id: s.id,
+            module: { titre: m.titre },
+            heure_debut: s.heure_debut
+          })
+        }
+      })
+    }))
+
+    // Annonces du premier module
+    if (modulesRes.data.length > 0) {
+      const ann = await axios.get(`/etudiant/modules/${modulesRes.data[0].id}/annonces`)
+      annonces.value = ann.data
+    }
+
+    // Construire le graphe
+    updateChart()
+
+  } catch (error) {
+    console.error("Erreur dashboard :", error)
+  }
 })
 
-/* =======================
-   Graphe Absences / Module
-======================= */
-function buildChart() {
-  const currentMonth = new Date().getMonth()
+// Génère la liste des mois disponibles d'après les présences
+function generateAvailableMonths() {
+  const monthsSet = new Set()
+  presences.value.forEach(p => {
+    const date = new Date(p.horodatage)
+    const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}`
+    monthsSet.add(monthKey)
+  })
+  availableMonths.value = Array.from(monthsSet).sort()
+}
+
+// Met à jour le graphe pour le mois sélectionné
+function updateChart() {
   const absencesParModule = {}
 
   presences.value.forEach(p => {
-    if (!p.seance || !p.seance.module) return
-
-    const date = new Date(p.horodatage)
-
-    if (
-      p.statut === 'absent' &&
-      date.getMonth() === currentMonth
-    ) {
-      const module = p.seance.module.titre
-      absencesParModule[module] =
-        (absencesParModule[module] || 0) + 1
+    if (p.statut === 'absent') {
+      const date = new Date(p.horodatage)
+      const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}`
+      if (monthKey === selectedMonth.value) {
+        const module = p.seance.module.titre
+        absencesParModule[module] = (absencesParModule[module] || 0) + 1
+      }
     }
   })
 
-  if (chartInstance) chartInstance.destroy()
+  const labels = Object.keys(absencesParModule)
+  const data = Object.values(absencesParModule)
+
+  if (chartInstance) {
+    chartInstance.destroy()
+  }
 
   chartInstance = new Chart(chartCanvas.value, {
     type: 'bar',
     data: {
-      labels: Object.keys(absencesParModule),
-      datasets: [
-        {
-          label: 'Absences',
-          data: Object.values(absencesParModule),
-          backgroundColor: '#ef4444'
-        }
-      ]
+      labels: labels,
+      datasets: [{
+        label: `Absences (${selectedMonth.value})`,
+        data: data,
+        backgroundColor: 'rgba(255, 99, 132, 0.5)'
+      }]
     },
     options: {
       responsive: true,
-      plugins: {
-        legend: { display: true }
+      plugins: { legend: { display: true } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          min: 0,      // commence à 1
+          max: 30,     // limite à 30
+          ticks: {
+            stepSize: 1,
+            callback: function(value) { return Number(value).toFixed(0) }
+          }
+        }
       }
     }
   })
@@ -140,32 +195,9 @@ function buildChart() {
 </script>
 
 <style scoped>
-.title {
-  font-size: 24px;
-  margin-bottom: 20px;
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.card, .box {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-}
-
-.annonce {
-  border-bottom: 1px solid #eee;
-  padding: 10px 0;
-}
+.title { font-size: 24px; margin-bottom: 20px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+.card, .box { background: white; padding: 20px; border-radius: 10px; }
+.grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+.annonce { border-bottom: 1px solid #eee; padding: 10px 0; }
 </style>
