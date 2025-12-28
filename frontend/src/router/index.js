@@ -63,15 +63,16 @@ const routes = [
     ]
   },
 
-  {
-    path: '/scan-qr',
+    {
+    path: '/ScanQR',
+
     component: DashboardLayout,
     meta: { requiresAuth: true },
     children: [
       {
         path: '',
-        name: 'ScanQR',
         component: ScanQR
+
       }
     ]
   },
