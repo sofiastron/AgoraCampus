@@ -13,7 +13,7 @@ import Dashboard from '../views/Dashboard.vue'
 import Courses from '@/views/Courses.vue'
 import ScanQR from '@/views/ScanQR.vue'
 import Profile from '@/views/Profile.vue'
-
+import Calendar from '@/views/Calendrier.vue'
 const routes = [
   // ======================
   // Pages publiques
@@ -88,7 +88,16 @@ const routes = [
         component: Profile
       }
     ]
-  }
+  },
+  {
+  path: '/calendrier',
+  component: DashboardLayout,
+  meta: { requiresAuth: true },
+  children: [
+    { path: '', name: 'Calendar', component: Calendar }
+  ]
+}
+
 ]
 
 const router = createRouter({
