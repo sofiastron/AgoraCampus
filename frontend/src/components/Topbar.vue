@@ -171,7 +171,26 @@ const logout = async () => {
 }
 
 const searchRequest = () => {
-  console.log('Recherche:', search.value)
+  const q = search.value.trim().toLowerCase()
+  if (!q) return
+
+  // mapping mot-clé → route
+  if (q.includes('dash') ) {
+    router.push('/dashboard')
+  } else if (q.includes('cours')) {
+    router.push('/courses')
+  } else if (q.includes('scan') || q.includes('qr')) {
+    router.push('/ScanQR')
+  } else if (q.includes('profi')) {
+    router.push('/profile')
+  } else if (q.includes('cal') || q.includes('agenda')) {
+    router.push('/calendrier')
+  } else {
+    alert('Aucun résultat pour : ' + search.value)
+  }
+
+  // vider le champ après recherche
+  search.value = ''
 }
 
 const refreshUserPhoto = (newPhotoUrl) => {
