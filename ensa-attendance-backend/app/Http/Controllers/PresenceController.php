@@ -63,32 +63,48 @@ class PresenceController extends Controller
     }
 
     public function enregistrerPresencesDepuisIA(Request $request)
-    {
-        $request->validate([
-            'face_ai_response' => 'required|array',
-            'seance_id' => 'required|integer',
-        ]);
+{
+    $request->validate([
+        'face_ai_response' => 'required|array',
+        'seance_id' => 'required|integer',
+    ]);
 
-        $faceData = $request->face_ai_response;
-        $seanceId = $request->seance_id;
+    $faceData = $request->face_ai_response;
+    $seanceId = $request->seance_id;
 
-        foreach ($faceData as $face) {
-            if (isset($face['id'])) {
-                Presence::updateOrCreate(
-                    [
-                        'etudiant_id' => $face['id'],
-                        'seance_id' => $seanceId
-                    ],
-                    [
-                        'statut' => $face['statut']
-                    ]
-                );
-            }
-        }
+    // Récupérer la séance avec le module et le groupe
+    $seance = \App\Models\Seance::with('module')->findOrFail($seanceId);
 
+    if (!$seance->module || !$seance->module->groupe_id) {
         return response()->json([
-            'success' => true,
-            'message' => 'Présences enregistrées'
-        ]);
+            'success' => false,
+            'message' => 'La séance n’a pas de module ou de groupe associé.'
+        ], 400);
     }
+
+    $groupeId = $seance->module->groupe_id;
+
+    // Récupérer tous les étudiants du groupe en une seule requête
+    $etudiantsDuGroupe = Etudiant::where('groupe_id', $groupeId)->pluck('id')->toArray();
+
+    foreach ($faceData as $face) {
+        if (isset($face['id']) && in_array($face['id'], $etudiantsDuGroupe)) {
+            Presence::updateOrCreate(
+                [
+                    'etudiant_id' => $face['id'],
+                    'seance_id' => $seanceId
+                ],
+                [
+                    'statut' => $face['statut']
+                ]
+            );
+        }
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Présences enregistrées pour les étudiants du groupe'
+    ]);
+}
+
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Module extends Model
 {
-    protected $fillable = ['titre', 'description', 'enseignant_id', 'photo'];
+    protected $fillable = ['titre', 'description', 'enseignant_id','groupe_id', 'photo'];
 
     public function enseignant()
     {
@@ -27,4 +27,10 @@ class Module extends Model
     {
         return $this->hasMany(Annonce::class);
     }
+
+    public function groupe()
+    {
+        return $this->belongsTo(Groupe::class, 'groupe_id', 'id_groupe');
+    }
+
 }

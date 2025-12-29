@@ -21,11 +21,14 @@
           <span class="icon">{{ item.icon }}</span>
           <span class="text">{{ item.label }}</span>
         </li>
-        <li>
-          <router-link to="/face-recognition">
-            📸 Présence par reconnaissance faciale
-          </router-link>
-
+        <li class="photo-capture-item">
+          <button class="photo-capture-btn" @click="go('/face-recognition')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            Photo Capture
+          </button>
         </li>
       </ul>
     </nav>
@@ -123,5 +126,39 @@ const go = (path) => {
   align-items: center;
   justify-content: center;
   font-weight: bold;
+}
+
+/* Styles pour le bouton Photo Capture */
+.photo-capture-item {
+  padding: 0 !important;
+  margin-top: 10px;
+}
+
+.photo-capture-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+  transition: all 0.3s ease;
+}
+
+.photo-capture-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(79, 70, 229, 0.4);
+}
+
+.photo-capture-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
 }
 </style>
