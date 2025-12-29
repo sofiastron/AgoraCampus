@@ -32,4 +32,9 @@ class Module extends Model
     {
         return $this->hasMany(Annonce::class);
     }
+    public function groupe()
+{
+    return $this->belongsTo(Groupe::class);
+}
+
 }

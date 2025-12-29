@@ -15,4 +15,9 @@ class Groupe extends Model
     {
         return $this->hasMany(Etudiant::class);
     }
+    public function modules()
+{
+    return $this->hasMany(Module::class);
+}
+
 }

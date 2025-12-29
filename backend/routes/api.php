@@ -40,5 +40,6 @@ Route::middleware('auth:sanctum')->prefix('etudiant')->group(function () {
     Route::get('/modules/{id}/annonces', [AnnonceController::class, 'index']);
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/profile/photo', [AuthController::class, 'updatePhoto']);
+    Route::get('/calendar', [SeanceController::class, 'calendar']);
 
 });

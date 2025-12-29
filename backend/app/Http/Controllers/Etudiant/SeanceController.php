@@ -20,4 +20,27 @@ class SeanceController extends Controller
             Seance::with('module')->findOrFail($id)
         );
     }
+    public function calendar()
+{
+    $etudiant = auth()->user()->etudiant;
+
+    if (!$etudiant || !$etudiant->groupe_id) {
+        return response()->json([]);
+    }
+
+    $seances = Seance::whereHas('module', function ($query) use ($etudiant) {
+        $query->where('groupe_id', $etudiant->groupe_id);
+    })
+    ->with('module')
+    ->get();
+
+    return response()->json(
+        $seances->map(fn ($s) => [
+            'title' => $s->module->titre,
+            'start' => $s->date . 'T' . $s->heure_debut,
+            'end'   => $s->date . 'T' . $s->heure_fin,
+        ])
+    );
+}
+
 }
