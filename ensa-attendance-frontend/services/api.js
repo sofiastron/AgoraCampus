@@ -1,4 +1,4 @@
-// src/services/auth.js
+
 export function isLoggedIn() {
   return localStorage.getItem("enseignant_token") !== null;
 }

@@ -37,7 +37,9 @@ class Utilisateur extends Authenticatable
     }
 
     public function enseignant()
-    {
-        return $this->hasOne(Enseignant::class);
-    }
+{
+    return $this->hasOne(Enseignant::class, 'utilisateur_id');
+}
+
+
 }

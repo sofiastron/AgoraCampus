@@ -8,44 +8,50 @@ use App\Http\Controllers\AnnonceController;
 use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EnseignantController;
+use App\Http\Controllers\DashboardController;
 
-// Route test simple
-Route::get('/test', function() {
+Route::get('/test', function () {
     return response()->json(['status' => 'ok']);
 });
 
-// Auth
 Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
-use App\Http\Controllers\DashboardController;
-
-Route::middleware('auth:sanctum')->get('/teacher/dashboard-stats', [DashboardController::class, 'stats']);
+Route::middleware('auth:sanctum')->group(function () {
 
 
-// Modules
-Route::get('/teacher/modules/{enseignantId}', [ModuleController::class, 'mesModules']);
-Route::post('/modules', [ModuleController::class, 'store']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 
 
+    Route::get('/teacher/dashboard-stats', [DashboardController::class, 'stats']);
+    Route::get('/teacher/presence-stats-by-module', [DashboardController::class, 'presenceStatsByModule']);
 
-// Séances
-Route::get('/seances/module/{moduleId}', [SeanceController::class, 'seancesParModule']);
-Route::post('/seances', [SeanceController::class, 'store']);
-Route::get('/seances/{seanceId}/qrcode', [SeanceController::class, 'genererQRCode']);
-Route::get('/seances/{id}', [SeanceController::class, 'show']);
 
-// Annonces
+    Route::get('/teacher/modules', [ModuleController::class, 'mesModules']);
+    Route::post('/modules', [ModuleController::class, 'store']);
+
+   Route::post('/seances', [SeanceController::class, 'store']);
+
+    Route::get('/seances/{id}/qrcode', [SeanceController::class, 'genererQRCode']);
+
+    Route::post('/annonces', [AnnonceController::class, 'store']);
+
+
+    Route::post('/presences', [PresenceController::class, 'enregistrerPresence']);
+    Route::post('/presences/face-recognition', [PresenceController::class, 'faceRecognition']);
+
+
+    Route::post('/documents', [DocumentController::class, 'store']);
+});
+
+
 Route::get('/annonces/module/{moduleId}', [AnnonceController::class, 'annoncesModule']);
-Route::post('/annonces', [AnnonceController::class, 'store']);
-
-// Présences
-Route::get('presences/seance/{seanceId}', [PresenceController::class, 'presencesSeance']);
-Route::post('presences', [PresenceController::class, 'enregistrerPresence']);
-Route::post('presences/face-recognition', [PresenceController::class, 'faceRecognition']);
-// Documents
+Route::get('/presences/seance/{seanceId}', [PresenceController::class, 'presencesSeance']);
 Route::get('/documents/module/{moduleId}', [DocumentController::class, 'documentsModule']);
-Route::post('/documents', [DocumentController::class, 'store']);
 
-// Enseignant profil
+
 Route::get('/enseignant/{id}', [EnseignantController::class, 'profil']);
+Route::middleware('auth:sanctum')->group(function () {
+
+
+    Route::get('/teacher/etudiants-presence', [PresenceController::class, 'getEtudiantsPresence']);
+});

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Module extends Model
 {
     protected $fillable = ['titre', 'description', 'enseignant_id', 'photo'];
@@ -12,6 +12,15 @@ class Module extends Model
     {
         return $this->belongsTo(Enseignant::class);
     }
+    public function etudiants(): BelongsToMany
+{
+    return $this->belongsToMany(
+        Etudiant::class,
+        'module_etudiant',
+        'module_id',
+        'etudiant_id'
+    );
+}
 
     public function seances()
     {

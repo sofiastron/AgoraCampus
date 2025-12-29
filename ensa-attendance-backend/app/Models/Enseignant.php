@@ -12,11 +12,12 @@ class Enseignant extends Model
 
     public function modules()
     {
-        return $this->hasMany(Module::class);
+        return $this->hasMany(Module::class,'enseignant_id');
     }
 
     public function utilisateur()
-    {
-        return $this->belongsTo(Utilisateur::class);
-    }
+{
+    return $this->belongsTo(Utilisateur::class, 'utilisateur_id');
+}
+
 }

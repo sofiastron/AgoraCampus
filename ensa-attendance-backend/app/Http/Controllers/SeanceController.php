@@ -3,65 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Seance;
-use App\Models\GenerateurQRCode;
 use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SeanceController extends Controller
 {
-    public function seancesParModule($moduleId)
-    {
-        return response()->json([
-            'success' => true,
-            'seances' => Seance::where('module_id', $moduleId)->get()
-        ]);
-    }
 
     public function store(Request $request)
     {
-       
-        $validatedData = $request->validate([
+        $validated = $request->validate([
+            'module_id' => 'required|exists:modules,id',
             'date' => 'required|date',
-            'module_id' => 'required|integer|exists:modules,id',
-            'heure_debut' => 'required|date_format:H:i:s',
-            'heure_fin' => 'required|date_format:H:i:s',
-            'qr_code' => 'nullable|string',
+            'heure_debut' => 'required|date_format:H:i',
+            'heure_fin' => 'required|date_format:H:i|after:heure_debut',
         ]);
-        $seance = Seance::create($validatedData);
+
+        $seance = Seance::create($validated);
 
         return response()->json([
             'success' => true,
-            'seance' => $seance
+            'seance' => $seance,
         ]);
     }
 
-    public function genererQRCode($seanceId)
+   
+    public function qrcode(Seance $seance)
     {
-        $qr = GenerateurQRCode::create([
-            'contenu' => uniqid('QR_'),
-            'dateExpiration' => now()->addMinutes(15),
-            'seance_id' => $seanceId
-        ]);
+        $contenu = "seance_id:" . $seance->id;
 
-        return response()->json([
-            'success' => true,
-            'qrcode' => $qr
-        ]);
+        $qr = QrCode::format('png')->size(300)->generate($contenu);
+
+        return response($qr)->header('Content-Type', 'image/png');
     }
-    public function show($id)
-{
-    $seance = Seance::find($id);
-
-    if (!$seance) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Séance non trouvée'
-        ], 404);
-    }
-
-    return response()->json([
-        'success' => true,
-        'seance' => $seance
-    ]);
-}
-
 }

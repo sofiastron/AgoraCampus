@@ -1,6 +1,6 @@
 <template>
   <div class="presence-page">
-    
+
     <div class="cards-container">
       <PresenceCard
         title="Présence par QR Code"
@@ -47,7 +47,7 @@ function goToFacialRecognition() {
   font-weight: 700;
   text-align: center;
   margin-bottom: 2rem;
-  color: #1e293b; /* Gris foncé */
+  color: #1e293b;
 }
 
 .cards-container {
@@ -57,5 +57,5 @@ function goToFacialRecognition() {
   flex-wrap: wrap;
 }
 
-/* Styles du PresenceCard (si tu n'as pas déjà un style dedans) */
+
 </style>

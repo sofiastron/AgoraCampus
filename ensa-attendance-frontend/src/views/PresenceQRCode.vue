@@ -1,186 +1,222 @@
 <template>
-  <div class="presence-qrcode-page">
-    <h1>Présence par QR Code</h1>
+  <div class="container">
+    <h2 class="title">Configuration de la Séance</h2>
 
-    <div class="cards-container">
-      <!-- Card 1: Formulaire -->
-      <div class="card form-card">
-        <h2>Configurer la séance</h2>
-        <form @submit.prevent="generateQRCode">
-          <label>
-            Module:
-            <select v-model="session.module" required>
-              <option disabled value="">Sélectionner un module</option>
-              <option v-for="mod in modules" :key="mod.id" :value="mod.name">{{ mod.name }}</option>
-            </select>
-          </label>
+    <form @submit.prevent="createSeance" class="form">
+      <label for="module-select">Module</label>
+      <select v-model="form.module_id" id="module-select" required>
+        <option disabled value="">-- Sélectionner un module --</option>
+        <option v-for="module in modules" :key="module.id" :value="module.id">
+          {{ module.titre }}
+        </option>
+      </select>
 
-          <label>
-            Salle:
-            <input type="text" v-model="session.room" placeholder="Ex: B101" required />
-          </label>
+      <label for="date">Date</label>
+      <input type="date" v-model="form.date" id="date" required />
 
-          <label>
-            Date séance:
-            <input type="date" v-model="session.date" required />
-          </label>
+      <label for="heure_debut">Heure de début</label>
+      <input type="time" v-model="form.heure_debut" id="heure_debut" required />
 
-          <label>
-            Classe:
-            <input type="text" v-model="session.class" placeholder="Ex: 2A" required />
-          </label>
+      <label for="heure_fin">Heure de fin</label>
+      <input type="time" v-model="form.heure_fin" id="heure_fin" required />
 
-          <label>
-            Durée validité QR code (minutes):
-            <input type="number" v-model.number="session.qrValidity" min="1" max="120" required />
-          </label>
+      <button type="submit" :disabled="loading" class="btn">
+        {{ loading ? "Création..." : "Créer la séance" }}
+      </button>
+    </form>
 
-          <button type="submit">Générer QR Code</button>
-        </form>
+    <transition name="fade">
+      <div v-if="seanceId" class="qr-code-container">
+        <h3>QR Code de la séance</h3>
+        <qrcode-vue :value="qrData" :size="200" />
       </div>
+    </transition>
 
-      <!-- Card 2: QR Code -->
-      <div class="card qrcode-card">
-        <h2>QR Code de la séance</h2>
-        <div v-if="qrCodeData">
-          <qrcode-vue :value="qrCodeData" :size="220" />
-          <p>Valable pendant {{ session.qrValidity }} minutes</p>
-        </div>
-        <div v-else>
-          <p>Remplissez le formulaire pour générer le QR code</p>
-        </div>
-      </div>
-    </div>
+    <p v-if="error" class="error-message">{{ error }}</p>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import QrcodeVue from 'qrcode.vue'
+<script>
+import QrcodeVue from "qrcode.vue";
+import api from "@/api/axios";
 
-// Exemple de modules, à remplacer par données réelles venant du backend
-const modules = [
-  { id: 1, name: 'Mathématiques' },
-  { id: 2, name: 'Informatique' },
-  { id: 3, name: 'Physique' },
-]
+export default {
+  components: { QrcodeVue },
 
-const session = ref({
-  module: '',
-  room: '',
-  date: '',
-  class: '',
-  qrValidity: 5,
-})
+  data() {
+    return {
+      modules: [],
+      form: {
+        module_id: "",
+        date: "",
+        heure_debut: "",
+        heure_fin: ""
+      },
+      seanceId: null,
+      loading: false,
+      error: null
+    };
+  },
 
-const qrCodeData = ref('')
+  computed: {
+    qrData() {
+      return `seance_id:${this.seanceId}`;
+    }
+  },
 
-function generateQRCode() {
-  // Créer une chaîne de données à encoder dans le QR code (JSON par ex)
-  const data = {
-    module: session.value.module,
-    room: session.value.room,
-    date: session.value.date,
-    class: session.value.class,
-    qrValidity: session.value.qrValidity,
-    generatedAt: new Date().toISOString()
+  async created() {
+    try {
+      const res = await api.get("/teacher/modules");
+      console.log("Modules reçus:", res.data);
+
+
+      if (Array.isArray(res.data)) {
+        this.modules = res.data;
+      } else if (res.data.modules) {
+        this.modules = res.data.modules;
+      } else {
+        this.error = "Format de données inattendu pour les modules.";
+        this.modules = [];
+      }
+    } catch (err) {
+      console.error("Erreur lors du chargement des modules:", err);
+      this.error = "Erreur lors du chargement des modules.";
+    }
+  },
+
+  methods: {
+    async createSeance() {
+      this.error = null;
+      this.loading = true;
+
+      try {
+        const res = await api.post("/seances", this.form);
+        this.seanceId = res.data.seance.id;
+      } catch (err) {
+        console.error(err);
+        if (err.response?.status === 401) {
+          this.error = "Session expirée. Veuillez vous reconnecter.";
+        } else {
+          this.error = "Erreur lors de la création de la séance.";
+        }
+      } finally {
+        this.loading = false;
+      }
+    }
   }
-
-  qrCodeData.value = JSON.stringify(data)
-}
+};
 </script>
 
 <style scoped>
-.presence-qrcode-page {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #2c3e50;
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 2rem;
-  font-weight: 700;
-  font-size: 2.2rem;
-}
-
-.cards-container {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  padding: 2rem;
-  flex: 1 1 400px;
+.container {
   max-width: 450px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin: 40px auto;
+  background: #f9f9f9;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.form-card form {
-  width: 100%;
+.title {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #3730a3;
+  font-weight: 700;
+  font-size: 1.8rem;
+  letter-spacing: 1.5px;
+}
+
+.form {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 15px;
 }
 
 label {
-  display: flex;
-  flex-direction: column;
   font-weight: 600;
-  font-size: 1rem;
-  color: #34495e;
+  color: #3730a3;
+  margin-bottom: 6px;
 }
 
-input[type="text"],
+select,
 input[type="date"],
-input[type="number"],
-select {
-  margin-top: 0.3rem;
-  padding: 0.5rem 0.8rem;
-  font-size: 1rem;
-  border: 1.5px solid #d1d5db;
+input[type="time"] {
+  padding: 10px 12px;
   border-radius: 8px;
-  transition: border-color 0.3s ease;
-}
-
-input[type="text"]:focus,
-input[type="date"]:focus,
-input[type="number"]:focus,
-select:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 6px #2563ebaa;
-}
-
-button {
-  margin-top: 1rem;
-  background-color: #2563eb;
-  color: white;
-  padding: 0.8rem;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #1e40af;
-}
-
-.qrcode-card p {
-  margin-top: 1rem;
+  border: 1.8px solid gray;
   font-size: 1rem;
-  color: #555;
+  transition: border-color 0.3s ease;
+  color: #000000; 
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+select:focus,
+input[type="date"]:focus,
+input[type="time"]:focus {
+  outline: none;
+  border-color: gray;
+  box-shadow: 0 0 8px #3730a3aa;
+  color: black;
+}
+
+.btn {
+  background: linear-gradient(135deg, #4338ca, #3730a3);
+  color: white;
+  font-weight: 700;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  box-shadow: 0 5px 15px #4338caaa;
+  transition: all 0.4s ease;
+}
+
+.btn:disabled {
+  background: #a5d6a7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn:hover:not(:disabled) {
+  box-shadow: 0 8px 25px #3730a3cc;
+  transform: translateY(-3px);
+}
+
+.qr-code-container {
+  margin-top: 25px;
+  text-align: center;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+.error-message {
+  color: #d32f2f;
+  margin-top: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.6s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

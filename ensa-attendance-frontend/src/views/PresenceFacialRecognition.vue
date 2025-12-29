@@ -6,9 +6,9 @@
 </template>
 
 <script setup>
-// Ici tu pourras ajouter la logique pour la reconnaissance faciale
+
 </script>
 
 <style scoped>
-/* styles spécifiques */
+
 </style>

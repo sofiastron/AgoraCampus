@@ -6,6 +6,10 @@ import PresenceHome from '@/views/PresenceHome.vue'
 import PresenceQRCode from '@/views/PresenceQRCode.vue'
 import PresenceFacialRecognition from '@/views/PresenceFacialRecognition.vue'
 
+import DocumentsAnnonces from '@/views/DocumentsAnnonces.vue'
+import ListeEtudiants from '@/views/ListeEtudiants.vue'
+import EmploiDuTemps from '@/views/EmploiDuTemps.vue'
+
 const routes = [
   { path: '/', redirect: '/login' },
 
@@ -27,13 +31,33 @@ const routes = [
     children: [
       {
         path: 'qrcode',
-        component: PresenceQRCode
+        component: PresenceQRCode,
+        meta: { requiresAuth: true }  
       },
       {
         path: 'facial',
-        component: PresenceFacialRecognition
+        component: PresenceFacialRecognition,
+        meta: { requiresAuth: true }
       }
     ]
+  },
+
+  {
+    path: '/documents-annonces',
+    component: DocumentsAnnonces,
+    meta: { requiresAuth: true }
+  },
+
+  {
+    path: '/liste-etudiants',
+    component: ListeEtudiants,
+    meta: { requiresAuth: true }
+  },
+
+  {
+    path: '/emploi-du-temps',
+    component: EmploiDuTemps,
+    meta: { requiresAuth: true }
   }
 ]
 

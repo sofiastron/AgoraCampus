@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Seance extends Model
 {
     protected $fillable = [
-        'date', 'heure_debut', 'heure_fin', 'qr_code', 'module_id'
+        'module_id',
+        'date',
+        'heure_debut',
+        'heure_fin',
+        'enseignant_id',
+        'qr_code'         
     ];
 
     public function presences()
@@ -18,5 +23,10 @@ class Seance extends Model
     public function module()
     {
         return $this->belongsTo(Module::class);
+    }
+
+    public function enseignant()
+    {
+        return $this->belongsTo(Enseignant::class);
     }
 }

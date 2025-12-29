@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-   
+
     <div v-if="loading" class="loading">Chargement des données...</div>
     <div v-else-if="error" class="error">Erreur : {{ error }}</div>
 
@@ -41,18 +41,40 @@
         </div>
       </div>
     </div>
+
+    <PresenceStatsChart
+      v-if="chartData && chartData.labels.length"
+      :data="chartData"
+      :options="chartOptions"
+    />
   </div>
 </template>
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 import axios from '../api/axios'
+import PresenceStatsChart from '@/components/PresenceStatsChart.vue'
+
 
 const stats = reactive({
   totalEtudiants: 0,
   totalModules: 0,
   seancesTodayCount: 0,
   seancesToday: [],
+})
+
+
+const chartData = ref({
+  labels: [],
+  datasets: []
+})
+const chartOptions = ref({
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top'
+    }
+  }
 })
 
 const loading = ref(false)
@@ -69,12 +91,28 @@ const fetchStats = async () => {
       },
     })
 
-    console.log('Dashboard stats:', data)
 
     stats.totalEtudiants = data.totalEtudiants
     stats.totalModules = data.totalModules
     stats.seancesToday = data.seancesToday
     stats.seancesTodayCount = data.seancesToday.length
+
+
+    if (data.presenceStats && data.presenceStats.length > 0) {
+      chartData.value = {
+        labels: data.presenceStats.map(item => item.module),
+        datasets: [
+          {
+            label: 'Taux de présence (%)',
+            backgroundColor: '#6366f1',
+            data: data.presenceStats.map(item => item.taux_presence)
+          }
+        ]
+      }
+    } else {
+
+      chartData.value = { labels: [], datasets: [] }
+    }
   } catch (e) {
     error.value = e.response?.data?.message || e.message || 'Erreur inconnue'
   } finally {
@@ -85,35 +123,36 @@ const fetchStats = async () => {
 onMounted(fetchStats)
 </script>
 
+
 <style scoped>
 .dashboard-container {
   max-width: 1100px;
-  margin: 3rem auto;
+  margin: 2rem auto;
   padding: 2rem;
   font-family: 'Inter', 'Segoe UI', sans-serif;
   color: #0f172a;
   animation: fadeIn 0.8s ease;
 }
 
-/* TITRE */
+
 h1 {
   text-align: center;
   font-size: 2.4rem;
   font-weight: 700;
   margin-bottom: 2.5rem;
-  background: linear-gradient(90deg, #6366f1, #22d3ee);
+  background: linear-gradient(90deg, #4338ca, #3730a3);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* GRID STATS */
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 2rem;
 }
 
-/* CARTES */
+
 .stat-card {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(12px);
@@ -139,22 +178,20 @@ h1 {
 .stat-card p {
   font-size: 3rem;
   font-weight: 800;
-  background: linear-gradient(90deg, #6366f1, #22d3ee);
+  background: linear-gradient(90deg, #4338ca, #3730a3);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* LOADING */
 .loading {
   margin-top: 4rem;
   text-align: center;
   font-size: 1.3rem;
   font-weight: 600;
-  color: #6366f1;
+  color: #4338ca;
   animation: pulse 1.4s infinite;
 }
 
-/* ERREUR */
 .error {
   text-align: center;
   margin-top: 3rem;
@@ -163,7 +200,6 @@ h1 {
   color: #ef4444;
 }
 
-/* SECTION AUJOURD'HUI */
 .today-section {
   margin-top: 4rem;
   animation: fadeIn 1s ease;
@@ -176,7 +212,6 @@ h1 {
   color: #1e293b;
 }
 
-/* LISTE SEANCES */
 .seance-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -184,18 +219,19 @@ h1 {
 }
 
 .seance-card {
-  background: linear-gradient(135deg, #6366f1, #22d3ee);
+  background: linear-gradient(1deg, #4338ca, #3730a3);
   color: white;
   padding: 1.4rem;
   border-radius: 16px;
-  box-shadow: 0 18px 35px rgba(34, 211, 238, 0.35);
+  box-shadow: 0 18px 35px #3730a3;
   transition: all 0.35s ease;
   animation: slideUp 0.6s ease forwards;
+  margin-bottom: 100px;
 }
 
 .seance-card:hover {
   transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 25px 55px rgba(34, 211, 238, 0.5);
+  box-shadow: 0 25px 55px #3730a3;
 }
 
 .seance-card p {
@@ -203,7 +239,6 @@ h1 {
   font-size: 0.95rem;
 }
 
-/* AUCUNE SEANCE */
 .no-seance {
   text-align: center;
   margin-top: 2rem;
@@ -212,7 +247,6 @@ h1 {
   color: #64748b;
 }
 
-/* ANIMATIONS */
 @keyframes fadeIn {
   from {
     opacity: 0;

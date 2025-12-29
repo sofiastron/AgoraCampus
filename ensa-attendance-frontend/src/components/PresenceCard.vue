@@ -38,12 +38,12 @@ defineProps({
 .presence-card h3 {
   font-size: 1.5rem;
   margin-bottom: 0.8rem;
-  color: #2563eb; /* Bleu moderne */
+  color:#4338ca;
 }
 
 .presence-card p {
   font-size: 1rem;
-  color: #475569; /* Gris bleu */
+  color: #475569; 
   line-height: 1.4;
 }
 </style>
