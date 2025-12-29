@@ -100,33 +100,8 @@
       </div>
     </div>
 
-    <!-- Séances du jour -->
-    <div class="sessions-section">
-      <div class="section-header">
-        <h3>Séances aujourd'hui</h3>
-        <span class="sessions-count">{{ seancesAujourdHui.length }}</span>
-      </div>
-      <div class="sessions-grid">
-        <div v-for="s in seancesAujourdHui" :key="s.id" class="session-card">
-          <div class="session-time">
-            <span class="time-badge">{{ formatTime(s.heure_debut) }}</span>
           </div>
-          <div class="session-info">
-            <h4 class="session-title">{{ s.module.titre }}</h4>
-            <p class="session-status">À suivre</p>
-          </div>
-          <div class="session-action">
-            <button class="join-btn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+     
 </template>
 
 <script setup>
