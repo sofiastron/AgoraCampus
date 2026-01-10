@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Admin;
 
 class User extends Authenticatable
 {
@@ -17,12 +18,16 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
-
+   protected $fillable = [
+    'nom',
+    'email',
+    'role',
+    'password'
+   ];
+public function admin()
+{
+    return $this->hasOne(Admin::class);
+}
     /**
      * The attributes that should be hidden for serialization.
      *

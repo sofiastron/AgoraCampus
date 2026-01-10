@@ -1,9 +1,11 @@
 <?php
 
 namespace Database\Seeders;
-
+use App\Models\Enseignant;
 use Illuminate\Database\Seeder;
-
+use Database\Seeders\UserSeeder;
+use Database\Seeders\GroupeSeeder;
+use Database\Seeders\EtudiantSeeder;
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -11,8 +13,14 @@ class DatabaseSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
-    {
-        // \App\Models\User::factory(10)->create();
-    }
+   public function run(): void
+{
+    $this->call([
+        UserSeeder::class,
+        GroupeSeeder::class,
+         EtudiantSeeder::class,
+            EnseignantSeeder::class,
+    ]);
+}
+
 }
