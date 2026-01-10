@@ -1,36 +1,28 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+namespace App\Models;
 
-class CreateUsersTable extends Migration
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes; // Ajoutez cette ligne
+
+class User extends Authenticatable
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
-    }
+    use HasFactory, SoftDeletes; // Ajoutez SoftDeletes ici
+    
+    protected $fillable = [
+        'nom', 'email', 'password', 'role'
+    ];
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+    
+    protected $dates = ['deleted_at']; // Ajoutez cette ligne
+    
+    // Vos relations existantes...
+    public function enseignant()
     {
-        Schema::dropIfExists('users');
+        return $this->hasOne(\App\Models\Enseignant::class, 'user_id');
     }
 }
