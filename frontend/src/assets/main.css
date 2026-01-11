@@ -1,0 +1,39 @@
+
+:root {
+  --sidebar-bg: linear-gradient(180deg, #373083 0%, #4338ca 100%);
+  --sidebar-text: #ffffff;
+  --sidebar-text-soft: rgba(255, 255, 255, 0.85);
+  --sidebar-hover: rgba(255, 255, 255, 0.1);
+  --sidebar-active: rgba(255, 255, 255, 0.15);
+  --sidebar-border: #ffffff;
+
+  --main-bg: #f8f9fa;
+  --topbar-bg: #ffffff;
+
+  --text-color: #333333;
+
+  --shadow: rgba(0, 0, 0, 0.1);
+}
+
+
+[data-theme="dark"] {
+  --sidebar-bg: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  --sidebar-text: #e5e7eb;
+  --sidebar-text-soft: rgba(229, 231, 235, 0.85);
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-active: rgba(255, 255, 255, 0.12);
+  --sidebar-border: #e5e7eb;
+
+  --main-bg: #020617;
+  --topbar-bg: #020617;
+
+  --text-color: #e5e7eb;
+
+  --shadow: rgba(0, 0, 0, 0.6);
+}
+
+body {
+  background-color: var(--main-bg);
+  color: var(--text-color);
+  margin: 0;
+}

@@ -1,141 +1,220 @@
 <template>
-  <div class="container mt-4">
-    <!-- En-tête -->
-    <div class="header mb-4">
-      <h2>Gestion des Emplois du Temps</h2>
-      <p class="text-muted">Visualisez et modifiez les emplois sauvegardés</p>
-      <button @click="$router.push('/Planning')" class="btn btn-secondary btn-sm">
-        ← Retour à la génération
-      </button>
+  <div class="container">
+    <!-- Header élégant avec fond gradient -->
+    <div class="header-section">
+      <div class="header-gradient">
+        <div class="header-content">
+          <div class="title-wrapper">
+            <div class="title-icon">📅</div>
+            <div>
+              <h1 class="main-title">Validation des Emplois du Temps</h1>
+              <p class="subtitle-text">Visualisez, modifiez et validez les emplois du temps</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Filtres -->
-    <div class="card mb-4">
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label>Filière</label>
-            <select v-model="filtreFiliere" class="form-control" @change="chargerEmplois">
-              <option value="">Toutes les filières</option>
-              <option v-for="f in filieres" :key="f.id" :value="f.id">{{ f.nom }}</option>
-            </select>
-          </div>
-          
-          <div class="col-md-4 mb-3">
-            <label>Semestre</label>
-            <select v-model="filtreSemestre" class="form-control" @change="chargerEmplois">
-              <option value="">Tous les semestres</option>
-              <option v-for="s in semestres" :key="s">{{ s }}</option>
-            </select>
-          </div>
-          
-          <div class="col-md-4 mb-3">
-            <label>Statut</label>
-            <select v-model="filtreStatut" class="form-control" @change="chargerEmplois">
-              <option value="">Tous les statuts</option>
-              <option value="en_attente">En attente</option>
-              <option value="valide">Validé</option>
-              <option value="rejeté">Rejeté</option>
-            </select>
-          </div>
+    <div class="filter-card">
+      <div class="filter-header">
+        <h3 class="filter-title">
+          <span class="filter-icon">🔍</span>
+          Filtres
+        </h3>
+      </div>
+      
+      <div class="filter-grid">
+        <div class="filter-item">
+          <label class="filter-label">
+            <span class="label-icon">🏫</span>
+            Filière
+          </label>
+          <select v-model="filtreFiliere" @change="chargerEmplois" class="filter-select">
+            <option value="">Toutes les filières</option>
+            <option v-for="f in filieres" :key="f.id" :value="f.id">{{ f.nom }}</option>
+          </select>
+        </div>
+        
+        <div class="filter-item">
+          <label class="filter-label">
+            <span class="label-icon">📚</span>
+            Semestre
+          </label>
+          <select v-model="filtreSemestre" @change="chargerEmplois" class="filter-select">
+            <option value="">Tous les semestres</option>
+            <option v-for="s in semestres" :key="s">{{ s }}</option>
+          </select>
+        </div>
+        
+        <div class="filter-item">
+          <label class="filter-label">
+            <span class="label-icon">📊</span>
+            Statut
+          </label>
+          <select v-model="filtreStatut" @change="chargerEmplois" class="filter-select">
+            <option value="">Tous les statuts</option>
+            <option value="en_attente">En attente</option>
+            <option value="valide">Validé</option>
+            <option value="rejeté">Rejeté</option>
+          </select>
         </div>
       </div>
     </div>
 
     <!-- Messages -->
-    <div v-if="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
-      <button @click="errorMessage = ''" class="btn-close"></button>
+    <div v-if="errorMessage" class="message-toast error show">
+      <div class="toast-content">
+        <div class="toast-icon error">⚠️</div>
+        <div class="toast-message">
+          <strong>Erreur</strong>
+          <p>{{ errorMessage }}</p>
+        </div>
+      </div>
+      <button @click="errorMessage = ''" class="toast-close">×</button>
     </div>
 
-    <div v-if="successMessage" class="alert alert-success">
-      {{ successMessage }}
-      <button @click="successMessage = ''" class="btn-close"></button>
+    <div v-if="successMessage" class="message-toast success show">
+      <div class="toast-content">
+        <div class="toast-icon success">✅</div>
+        <div class="toast-message">
+          <strong>Succès</strong>
+          <p>{{ successMessage }}</p>
+        </div>
+      </div>
+      <button @click="successMessage = ''" class="toast-close">×</button>
     </div>
 
-    <!-- Tableau des emplois -->
-    <div class="card">
+    <!-- Tableau principal -->
+    <div class="main-card">
       <div class="card-header">
-        <div class="d-flex justify-content-between">
-          <h5 class="mb-0">Liste des emplois ({{ emplois.length }})</h5>
-          <button @click="chargerEmplois" class="btn btn-light btn-sm">
-            Actualiser
-          </button>
+        <div class="header-left">
+          <h2 class="card-title">
+            <span class="title-icon">📋</span>
+            Liste des emplois ({{ emplois.length }})
+          </h2>
         </div>
       </div>
 
-      <div class="card-body">
-        <!-- Chargement -->
-        <div v-if="loading" class="text-center py-5">
-          <div class="spinner-border text-primary"></div>
-          <p class="mt-2">Chargement...</p>
+      <!-- État de chargement -->
+      <div v-if="loading" class="loading-state">
+        <div class="spinner-container">
+          <div class="spinner"></div>
         </div>
+        <p class="loading-text">Chargement...</p>
+      </div>
 
-        <!-- Vide -->
-        <div v-else-if="emplois.length === 0" class="text-center py-5">
-          <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-          <h5 class="text-muted mt-3">Aucun emploi du temps</h5>
-        </div>
+      <!-- État vide -->
+      <div v-else-if="emplois.length === 0" class="empty-state-card">
+        <div class="empty-illustration">📭</div>
+        <h3 class="empty-title">Aucun emploi du temps trouvé</h3>
+        <p class="empty-description">
+          Aucun emploi du temps ne correspond à vos critères.
+        </p>
+      </div>
 
-        <!-- Liste -->
-        <div v-else>
-          <table class="table">
-            <thead>
-              <tr>
-                <th width="40">
-                  <input type="checkbox" 
-                         @change="toggleSelectionAll" 
-                         :checked="selection.length === emplois.length"
-                         class="form-check-input">
-                </th>
-                <th>Titre</th>
-                <th>Filière</th>
-                <th>Semestre</th>
-                <th>Niveau</th>
-                <th>Créé le</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="emploi in emplois" :key="emploi.id">
-                <td>
-                  <input type="checkbox" 
-                         :value="emploi.id" 
-                         v-model="selection"
-                         class="form-check-input">
-                </td>
-                <td>
-                  <strong>{{ emploi.titre || 'Sans titre' }}</strong>
-                  <small class="d-block text-muted">{{ emploi.description || '' }}</small>
-                </td>
-                <td>
-                  <span class="badge bg-secondary">{{ emploi.filiere?.nom }}</span>
-                </td>
-                <td>
-                  <span class="badge bg-primary">{{ emploi.semestre }}</span>
-                </td>
-                <td>{{ emploi.niveau || 'Tous' }}</td>
-                <td>{{ formatDate(emploi.created_at) }}</td>
-                <td>
-                  <span class="badge" :class="getStatusBadgeClass(emploi.statut)">
+      <!-- Liste des emplois -->
+      <div v-else class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="table-header">
+                <div class="header-content">
+                  📝 Titre
+                </div>
+              </th>
+              <th class="table-header">
+                <div class="header-content">
+                  🏫 Filière
+                </div>
+              </th>
+              <th class="table-header">
+                <div class="header-content">
+                  📚 Semestre
+                </div>
+              </th>
+              <th class="table-header">
+                <div class="header-content">
+                  🎓 Niveau
+                </div>
+              </th>
+              
+              <th class="table-header">
+                <div class="header-content">
+                  📊 Statut
+                </div>
+              </th>
+              <th class="table-header actions">
+                <div class="header-content">
+                  ⚙️ Actions
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="emploi in emplois" :key="emploi.id" class="table-row">
+              <td class="table-cell">
+                <div class="cell-content">
+                  <div class="cell-title">{{ emploi.titre || 'Sans titre' }}</div>
+                  <div class="cell-subtitle">{{ emploi.description || 'Aucune description' }}</div>
+                </div>
+              </td>
+              <td class="table-cell">
+                <div class="filiere-badge">
+                  {{ emploi.filiere?.nom || 'Non spécifié' }}
+                </div>
+              </td>
+              <td class="table-cell">
+                <span class="semestre-tag">{{ emploi.semestre }}</span>
+              </td>
+              <td class="table-cell">
+                <div class="niveau-info">{{ emploi.niveau || 'Tous niveaux' }}</div>
+              </td>
+              
+              
+              <td class="table-cell">
+                <div class="status-container">
+                  <span class="status-badge" :class="getStatusBadgeClass(emploi.statut)">
+                    <span class="status-icon">{{ getStatusIcon(emploi.statut) }}</span>
                     {{ getStatusLabel(emploi.statut) }}
                   </span>
-                </td>
-                <td>
-                  <div class="btn-group">
-                    <button @click="ouvrirEditModal(emploi)" class="btn btn-sm btn-outline-primary">
-                      Modifier
+                </div>
+              </td>
+              <td class="table-cell actions-cell">
+                <div class="actions-container">
+                  <!-- Bouton Valider (seulement si en attente) -->
+                  <button v-if="emploi.statut === 'en_attente'" 
+                          @click="validerEmploi(emploi)" 
+                          class="action-btn validate-btn"
+                          :title="`Valider : ${emploi.titre}`">
+                    <span class="btn-icon">✅</span>
+                    <span class="btn-text">Valider</span>
+                  </button>
+                  
+                  <!-- Boutons Modifier/Supprimer (seulement si non validé) -->
+                  <div v-if="emploi.statut !== 'valide'" class="action-group">
+                    <button @click="ouvrirEditModal(emploi)" 
+                            class="action-btn edit-btn"
+                            :title="`Modifier : ${emploi.titre}`">
+                      <span class="btn-icon">✏️</span>
                     </button>
-                    <button @click="confirmerSuppression(emploi)" class="btn btn-sm btn-outline-danger">
-                      Supprimer
+                    <button @click="confirmerSuppression(emploi)" 
+                            class="action-btn delete-btn"
+                            :title="`Supprimer : ${emploi.titre}`">
+                      <span class="btn-icon">🗑️</span>
                     </button>
                   </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                  
+                  <!-- Message quand validé -->
+                  <div v-if="emploi.statut === 'valide'" class="validated-status">
+                    <span class="validated-icon">✅</span>
+                    <span class="validated-text">Validé</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -181,7 +260,6 @@
           <!-- Tableau emploi du temps -->
           <div v-for="(schedule, groupe) in emploiEdit.schedule" :key="groupe">
             <div v-if="!groupeActifEdit || groupeActifEdit === groupe" class="mb-4">
-              <!-- En-tête groupe -->
               <div class="d-flex justify-content-between mb-3">
                 <h6>
                   <span class="badge bg-secondary">{{ groupe }}</span>
@@ -297,39 +375,10 @@
               </div>
             </div>
           </div>
-
-          <!-- Résumé -->
-          <div class="card mt-4">
-            <div class="card-header">
-              <h6 class="mb-0">Résumé des modifications</h6>
-            </div>
-            <div class="card-body">
-              <div class="row text-center">
-                <div class="col">
-                  <small>Groupes</small>
-                  <div class="h5">{{ Object.keys(emploiEdit.schedule).length }}</div>
-                </div>
-                <div class="col">
-                  <small>Heures</small>
-                  <div class="h5">{{ calculerTotalHeures() }}h</div>
-                </div>
-                <div class="col">
-                  <small>Modules</small>
-                  <div class="h5">{{ getTotalModules() }}</div>
-                </div>
-                <div class="col">
-                  <small>Modifiés</small>
-                  <div class="h5" :class="aModifications() ? 'text-warning' : 'text-success'">
-                    {{ aModifications() ? 'Oui' : 'Non' }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
         
         <div class="modal-footer">
-          <button @click="fermerEditModal" class="btn btn-secondary">Annuler</button>
+          <button @click="fermerEditModal" class="btn btn-secondary">Fermer</button>
           <button @click="sauvegarderModifications" class="btn btn-primary" :disabled="sauvegardeEnCours || !aModifications()">
             <span v-if="sauvegardeEnCours">
               <span class="spinner-border spinner-border-sm me-1"></span>
@@ -360,7 +409,6 @@
               Niveau: {{ emploiASupprimer?.niveau }}
             </small>
           </div>
-          <p class="text-danger"><small>Cette action est irréversible !</small></p>
         </div>
         <div class="modal-footer">
           <button @click="showDeleteModal = false" class="btn btn-secondary">Annuler</button>
@@ -412,6 +460,27 @@ export default {
     this.chargerEmplois();
   },
   methods: {
+    // === VALIDATION ===
+    async validerEmploi(emploi) {
+      try {
+        const response = await axios.post(`/api/planning/${emploi.id}/validate`, {
+          statut: 'valide'
+        });
+        
+        if (response.data?.success) {
+          this.successMessage = `Emploi "${emploi.titre}" validé avec succès !`;
+          emploi.statut = 'valide';
+          await this.chargerEmplois();
+          setTimeout(() => { this.successMessage = ''; }, 3000);
+        } else {
+          this.errorMessage = 'Erreur lors de la validation : ' + (response.data?.message || 'Erreur serveur');
+        }
+      } catch (error) {
+        console.error('Erreur détaillée:', error);
+        this.errorMessage = 'Erreur : ' + (error.response?.data?.message || error.message || 'Erreur inconnue');
+      }
+    },
+
     // === SUPPRESSION ===
     confirmerSuppression(emploi) {
       this.emploiASupprimer = emploi;
@@ -429,10 +498,6 @@ export default {
         this.errorMessage = 'Erreur suppression: ' + error.message;
         this.showDeleteModal = false;
       }
-    },
-
-    toggleSelectionAll() {
-      this.selection = this.selection.length === this.emplois.length ? [] : this.emplois.map(e => e.id);
     },
 
     // === CHARGEMENT ===
@@ -626,9 +691,7 @@ export default {
     },
     
     fermerEditModal() {
-      if (this.sauvegardeEnCours) return;
-      if (this.aModifications() && !confirm('Modifications non sauvegardées. Quitter ?')) return;
-      
+      // Fermer directement sans confirmation
       this.showEditModal = false;
       this.emploiEnEdition = null;
       this.emploiEdit = { schedule: {}, affectations: {}, semaines: {}, statistics: {} };
@@ -729,6 +792,7 @@ export default {
       }
     },
     
+    // === UTILITAIRES ===
     formatDate(dateString) {
       if (!dateString) return '';
       try {
@@ -741,12 +805,22 @@ export default {
     
     getStatusBadgeClass(status) {
       const classes = {
-        'en_attente': 'bg-warning text-dark',
-        'valide': 'bg-success',
-        'rejeté': 'bg-danger',
-        'archive': 'bg-secondary'
+        'en_attente': 'status-waiting',
+        'valide': 'status-valid',
+        'rejeté': 'status-rejected',
+        'archive': 'status-archived'
       };
-      return classes[status] || 'bg-secondary';
+      return classes[status] || 'status-unknown';
+    },
+    
+    getStatusIcon(status) {
+      const icons = {
+        'en_attente': '⏳',
+        'valide': '✅',
+        'rejeté': '❌',
+        'archive': '📦'
+      };
+      return icons[status] || '❓';
     },
     
     getStatusLabel(status) {
@@ -762,14 +836,598 @@ export default {
 };
 </script>
 
-<style scoped>/* Header */
-.header {
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 1rem;
-  margin-bottom: 1.5rem;
+<style scoped>
+/* Styles CSS avec les modifications */
+
+.container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+  min-height: 100vh;
 }
 
-/* Modals */
+/* Header élégant */
+.header-section {
+  margin-bottom: 30px;
+}
+
+.header-gradient {
+  background: linear-gradient(135deg, #373083 0%, #4a43a0 100%);
+  border-radius: 0 0 20px 20px;
+  padding: 40px 30px;
+  color: white;
+  box-shadow: 0 4px 20px rgba(55, 48, 163, 0.2);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.title-icon {
+  font-size: 3.5rem;
+  opacity: 0.9;
+}
+
+.main-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  color: white;
+}
+
+.subtitle-text {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Carte des filtres */
+.filter-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px 30px;
+  margin: 0 auto 30px;
+  max-width: 1200px;
+  box-shadow: 0 5px 20px rgba(55, 48, 163, 0.08);
+  border: 1px solid rgba(55, 48, 163, 0.1);
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(55, 48, 163, 0.1);
+}
+
+.filter-title {
+  color: #373083;
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.filter-icon {
+  font-size: 1.2rem;
+}
+
+.filter-refresh {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.filter-refresh:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+}
+
+.refresh-icon {
+  font-size: 1rem;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label-icon {
+  color: #373083;
+}
+
+.filter-select {
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: white;
+  transition: all 0.3s;
+  color: #333;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #373083;
+  box-shadow: 0 0 0 3px rgba(55, 48, 163, 0.1);
+}
+
+/* Messages toast */
+.message-toast {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-width: 350px;
+  max-width: 450px;
+  animation: slideInRight 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.message-toast.success {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(52, 211, 153, 0.95) 100%);
+  color: white;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.message-toast.error {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(239, 68, 68, 0.95) 100%);
+  color: white;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-grow: 1;
+}
+
+.toast-icon {
+  font-size: 1.8rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.toast-message {
+  flex-grow: 1;
+}
+
+.toast-message strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 1.1rem;
+}
+
+.toast-message p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.toast-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.toast-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Carte principale */
+.main-card {
+  background: white;
+  border-radius: 20px;
+  margin: 0 auto 40px;
+  max-width: 1200px;
+  box-shadow: 0 10px 40px rgba(55, 48, 163, 0.1);
+  overflow: hidden;
+  border: 1px solid rgba(55, 48, 163, 0.1);
+}
+
+.card-header {
+  padding: 25px 30px;
+  background: linear-gradient(to right, #f8f9ff, #ffffff);
+  border-bottom: 1px solid rgba(55, 48, 163, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.card-title {
+  color: #373083;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title-icon {
+  font-size: 1.8rem;
+}
+
+/* États */
+.loading-state {
+  padding: 60px 30px;
+  text-align: center;
+}
+
+.spinner-container {
+  margin-bottom: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(55, 48, 163, 0.1);
+  border-top: 4px solid #373083;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+.loading-text {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.empty-state-card {
+  padding: 80px 30px;
+  text-align: center;
+}
+
+.empty-illustration {
+  font-size: 5rem;
+  margin-bottom: 25px;
+  opacity: 0.2;
+}
+
+.empty-title {
+  color: #666;
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+}
+
+.empty-description {
+  color: #888;
+  margin-bottom: 30px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+/* Tableau */
+.table-wrapper {
+  overflow-x: auto;
+  padding: 0 30px 30px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-header {
+  background: linear-gradient(to bottom, #373083, #2a2568);
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 18px 15px;
+  text-align: left;
+  border: none;
+  position: relative;
+  white-space: nowrap;
+}
+
+.table-header.actions {
+  text-align: center;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-row {
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(55, 48, 163, 0.05);
+}
+
+.table-row:hover {
+  background-color: rgba(55, 48, 163, 0.02);
+}
+
+.table-cell {
+  padding: 20px 15px;
+  color: #333;
+  font-size: 0.95rem;
+  border: none;
+}
+
+.actions-cell {
+  text-align: center;
+}
+
+.cell-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cell-title {
+  font-weight: 600;
+  color: #373083;
+}
+
+.cell-subtitle {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.filiere-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.semestre-tag {
+  display: inline-block;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #e6f3ff 0%, #dbeafe 100%);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.niveau-info {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.date-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.status-container {
+  display: flex;
+  justify-content: center;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.status-waiting {
+  background-color: #fff7e6;
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.status-valid {
+  background-color: #e6f7ee;
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-rejected {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.status-archived {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.status-unknown {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.status-icon {
+  font-size: 0.9rem;
+}
+
+/* Actions */
+.actions-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 40px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+}
+
+.validate-btn {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: white;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+}
+
+.validate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+}
+
+.action-group {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-btn, .delete-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+}
+
+.edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+}
+
+.delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
+}
+
+.btn-icon {
+  font-size: 0.9rem;
+}
+
+.btn-text {
+  font-size: 0.85rem;
+}
+
+/* Message "Validé" */
+.validated-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #e6f7ee;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 20px;
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.validated-icon {
+  font-size: 0.9rem;
+}
+
+.validated-text {
+  font-size: 0.85rem;
+}
+
+/* Modales */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -818,7 +1476,7 @@ export default {
   border-bottom: none;
 }
 
-/* Tableau */
+/* Tableau d'édition */
 .table th, .table td {
   padding: 0.5rem;
   vertical-align: middle;
@@ -850,18 +1508,6 @@ export default {
   justify-content: center;
 }
 
-/* Input group simple */
-.input-group-text {
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  font-size: 0.85rem;
-  padding: 5px;}
-
-.input-group-sm input {
-  font-size: 0.85rem;
-  padding: 0.25rem;
-}
-
 /* Badges */
 .badge {
   font-size: 0.8rem;
@@ -883,68 +1529,45 @@ export default {
   .table-responsive {
     font-size: 0.85rem;
   }
-}
-/* Backdrop full screen */
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  z-index: 1050;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Modal full page */
-.modal-content-large {
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 0;
-  background-color: #fff;
-  overflow-y: auto;
-  padding: 1rem;
-  box-shadow: none;
-}
-
-/* Header & Footer fixes */
-.modal-header, .modal-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #ddd;
-}
-
-.modal-footer {
-  border-top: 1px solid #ddd;
-  border-bottom: none;
-}
-
-/* Tableau prend toute la largeur */
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-}
-
-/* Cellules */
-.cellule, .cellule-module, .pause {
-  min-height: 100px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .modal-content-large {
-    padding: 0.5rem;
+  
+  .filter-grid {
+    grid-template-columns: 1fr;
   }
-  .cellule {
-    min-height: 80px;
+  
+  .header-content {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .table-wrapper {
+    padding: 0 15px 15px;
+  }
+  
+  .actions-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .action-group {
+    justify-content: center;
   }
 }
 
+/* Animations */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>

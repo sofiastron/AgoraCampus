@@ -9,7 +9,7 @@ class EmploiTemps extends Model
 {
     use SoftDeletes;
     
-    protected $table = 'emplotemps';
+    protected $table = 'emplotemps'; // Assurez-vous que c'est le bon nom
     
     protected $fillable = [
         'titre',
@@ -24,7 +24,10 @@ class EmploiTemps extends Model
         'date_debut',
         'date_fin',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'date_validation', // Ajoutez ces champs
+        'valide_par',      // Ajoutez ces champs
+        'raison_rejet'     // Ajoutez ces champs
     ];
     
     protected $casts = [
@@ -33,7 +36,8 @@ class EmploiTemps extends Model
         'semaines' => 'array',
         'statistiques' => 'array',
         'date_debut' => 'date',
-        'date_fin' => 'date'
+        'date_fin' => 'date',
+        'date_validation' => 'datetime'
     ];
     
     public function filiere()
@@ -51,6 +55,11 @@ class EmploiTemps extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
     
+    public function validateur()
+    {
+        return $this->belongsTo(User::class, 'valide_par');
+    }
+    
     public function scopeActif($query)
     {
         return $query->where('statut', 'actif');
@@ -64,5 +73,15 @@ class EmploiTemps extends Model
     public function scopeBySemestre($query, $semestre)
     {
         return $query->where('semestre', $semestre);
+    }
+    
+    public function scopeValide($query)
+    {
+        return $query->where('statut', 'valide');
+    }
+    
+    public function scopeEnAttente($query)
+    {
+        return $query->where('statut', 'en_attente');
     }
 }

@@ -1,11 +1,13 @@
 <?php
 
 namespace Database\Factories;
+
 use App\Models\User;
 use App\Models\Groupe;
 use App\Models\Etudiant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+
 
 class EtudiantFactory extends Factory
 {
@@ -14,6 +16,7 @@ class EtudiantFactory extends Factory
      *
      * @return array
      */
+
   protected $model = \App\Models\Etudiant::class;
 
     public function definition(): array
@@ -29,3 +32,4 @@ class EtudiantFactory extends Factory
             'groupe_id' => $groupe ? $groupe->id : null,
         ];
     }}
+

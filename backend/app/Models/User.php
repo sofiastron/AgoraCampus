@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -37,6 +36,11 @@ public function admin()
         'password',
         'remember_token',
     ];
+
+     public function etudiant() {
+        return $this->hasOne(Etudiant::class, 'id');
+    }
+  
 
     /**
      * The attributes that should be cast.

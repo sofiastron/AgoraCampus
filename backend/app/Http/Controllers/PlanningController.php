@@ -846,7 +846,50 @@ class PlanningController extends Controller
         
         return $resultats;
     }
-
+/**
+ * Valider un emploi du temps
+ */
+/**
+ * Route spécifique pour valider un emploi
+ */
+public function validateEmploi(Request $request, $id)
+{
+    try {
+        \Log::info("=== VALIDATION SIMPLE EMPLOI ID: $id ===");
+        
+        // Validation simple
+        $request->validate([
+            'statut' => 'required|in:valide,en_attente,rejeté'
+        ]);
+        
+        // Trouver et mettre à jour l'emploi
+        $emploi = EmploiTemps::findOrFail($id);
+        
+        $emploi->update([
+            'statut' => $request->statut,
+            'updated_at' => now()
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Statut mis à jour avec succès',
+            'emploi' => $emploi
+        ]);
+        
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Emploi non trouvé'
+        ], 404);
+    } catch (\Exception $e) {
+        \Log::error('Erreur validation simple: ' . $e->getMessage());
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Erreur: ' . $e->getMessage()
+        ], 500);
+    }
+}
     /**
      * Sauvegarde un emploi du temps
      */
@@ -1053,7 +1096,82 @@ class PlanningController extends Controller
             ]);
         }
     }
-
+/**
+ * Récupère un emploi du temps spécifique par ID
+ */
+public function getEmploiById($id)
+{
+    try {
+        \Log::info("=== RÉCUPÉRATION EMPLOI ID: $id ===");
+        
+        // Vérifier si la table existe
+        if (!class_exists('App\\Models\\EmploiTemps') || !Schema::hasTable('emplotemps')) {
+            \Log::error('Table emplotemps non disponible');
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Table emploi du temps non disponible',
+                'data' => null
+            ]);
+        }
+        
+        $emploi = EmploiTemps::find($id);
+        
+        if (!$emploi) {
+            \Log::warning("Emploi ID $id non trouvé");
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Emploi du temps non trouvé',
+                'data' => null
+            ], 404);
+        }
+        
+        // Charger les données associées
+        $emploi->load('filiere');
+        
+        // Décoder les champs JSON si nécessaire
+        if ($emploi->horaires && is_string($emploi->horaires)) {
+            $emploi->horaires = json_decode($emploi->horaires, true);
+        }
+        
+        if ($emploi->affectations && is_string($emploi->affectations)) {
+            $emploi->affectations = json_decode($emploi->affectations, true);
+        }
+        
+        if ($emploi->semaines && is_string($emploi->semaines)) {
+            $emploi->semaines = json_decode($emploi->semaines, true);
+        }
+        
+        if ($emploi->statistics && is_string($emploi->statistics)) {
+            $emploi->statistics = json_decode($emploi->statistics, true);
+        }
+        
+        if ($emploi->details && is_string($emploi->details)) {
+            $emploi->details = json_decode($emploi->details, true);
+        }
+        
+        // Alias pour la compatibilité avec le frontend
+        $emploi->schedule = $emploi->horaires ?? [];
+        
+        \Log::info("Emploi ID $id récupéré avec succès");
+        
+        return response()->json([
+            'success' => true,
+            'data' => $emploi
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error("Erreur récupération emploi ID $id: " . $e->getMessage());
+        \Log::error('Trace: ' . $e->getTraceAsString());
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Erreur lors de la récupération de l\'emploi',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
     /**
      * Récupère la liste des emplois du temps sauvegardés
      */

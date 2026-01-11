@@ -29,10 +29,11 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+
     'openai' => [
     'api_key' => env('OPENAI_API_KEY'),
     'model' => env('OPENAI_MODEL', 'gpt-4-turbo-preview'),
     'timeout' => env('OPENAI_TIMEOUT', 60),
     'retry_attempts' => env('OPENAI_RETRY_ATTEMPTS', 3),
-],
+]
 ];

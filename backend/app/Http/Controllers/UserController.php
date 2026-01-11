@@ -15,28 +15,27 @@ class UserController extends Controller
     }
 
     // Ajouter un utilisateur
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'nom' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'role' => 'required|string',
-            'password' => 'required|min:6'
-        ]);
-
-        $user = User::create([
-            'nom' => $validated['nom'],
-            'email' => $validated['email'],
-            'role' => $validated['role'],
-            'password' => Hash::make($validated['password'])
-        ]);
-
+  public function store(Request $request)
+{
+    // Vérifier si l'email existe déjà
+    if (User::where('email', $request->email)->exists()) {
         return response()->json([
-            'message' => 'Utilisateur créé avec succès',
-            'user' => $user
-        ], 201);
+            'message' => 'Cet email est déjà utilisé.'
+        ], 422); // code 422 = erreur de validation
     }
 
+    // Créer l'utilisateur
+    $user = User::create([
+        'nom' => $request->nom,
+        'email' => $request->email,
+        'password' => bcrypt($request->password),
+        'role' => 'enseignant',
+    ]);
+
+    return response()->json($user, 201);
+}
+
+      
     // Voir un utilisateur
     public function show($id)
     {

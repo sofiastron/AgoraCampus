@@ -1,5 +1,4 @@
 
-// Import Bootstrap CSS et JS
 
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
@@ -7,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
 
 
-// src/main.js
+
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -38,4 +37,5 @@ app.use(Toast, {
 
 
 app.use(router)
+
 app.mount('#app')

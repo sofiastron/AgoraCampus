@@ -13,14 +13,15 @@ class Kernel extends HttpKernel
      *
      * @var array<int, class-string|string>
      */
-protected $middleware = [
-    \Fruitcake\Cors\HandleCors::class, // Doit être EN PREMIER
-    \App\Http\Middleware\TrustProxies::class,
-    \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
-    \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-    \App\Http\Middleware\TrimStrings::class,
-    \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-];
+    protected $middleware = [
+        \Fruitcake\Cors\HandleCors::class, // Doit être EN PREMIER
+        \App\Http\Middleware\TrustProxies::class,
+        \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
+        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        \App\Http\Middleware\TrimStrings::class,
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+    ];
+
     /**
      * The application's route middleware groups.
      *

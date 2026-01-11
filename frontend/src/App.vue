@@ -1,4 +1,5 @@
 <template>
+
  
  
     <router-view />
@@ -7,7 +8,7 @@
 
 
 <script>
-import NavBar from './components/NavBar.vue';
+
 
 export default {
   name: 'App',
@@ -42,3 +43,4 @@ export default {
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 </style>
+
