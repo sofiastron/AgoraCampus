@@ -17,8 +17,8 @@ return new class extends Migration
     $table->text('contenu');
     $table->dateTime('date_creation');
 
-    $table->foreignId('module_id')->constrained('modules');
-    $table->foreignId('enseignant_id')->constrained('enseignants');
+    $table->foreignId('enseignant_id')->constrained('enseignants')->onDelete('cascade');
+    $table->timestamps();
 });
     }
 

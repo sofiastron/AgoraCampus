@@ -6,13 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Annonce extends Model
 {
-    public $timestamps = false; 
     protected $fillable = [
-        'titre', 'contenu', 'date_Creation', 'module_id','enseignant_id',
+        'titre',
+        'contenu',
+        'date_creation',
+        'enseignant_id',
     ];
 
-    public function module()
+    protected $casts = [
+        'date_creation' => 'datetime',
+    ];
+
+    // Relations
+    public function enseignant()
     {
-        return $this->belongsTo(Module::class);
+        return $this->belongsTo(Enseignant::class);
     }
 }

@@ -16,10 +16,11 @@ return new class extends Migration
     $table->string('titre', 100);
     $table->string('chemin_fichier');
     $table->string('type_document', 50);
-    $table->dateTime('date_depot');
-    $table->dateTime('date_upload');
+    $table->dateTime('date_upload')->useCurrent();
 
-    $table->foreignId('module_id')->constrained('modules');
+    $table->foreignId('module_id')->constrained('modules')->onDelete('cascade');
+    $table->foreignId('enseignant_id')->constrained('enseignants')->onDelete('cascade');
+    $table->timestamps();
 });
     }
 
