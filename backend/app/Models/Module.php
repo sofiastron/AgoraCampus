@@ -3,32 +3,37 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Module extends Model
 {
-    protected $fillable = [
-        'titre', 
-        'description', 
-        'filiere_id', 
-        'is_common',
-        'niveau',
-        'semaine_debut',
-        'semaine_fin'
-    ];
+    protected $fillable = ['titre', 'description', 'enseignant_id', 'photo'];
 
-    public function getPeriodeAttribute()
+    public function enseignant()
     {
-        if ($this->semaine_debut && $this->semaine_fin) {
-            return "S{$this->semaine_debut}-S{$this->semaine_fin}";
-        }
-        return 'S1-S16'; // Par défaut
+        return $this->belongsTo(Enseignant::class);
+    }
+    public function etudiants(): BelongsToMany
+{
+    return $this->belongsToMany(
+        Etudiant::class,
+        'module_etudiant',
+        'module_id',
+        'etudiant_id'
+    );
+}
+
+    public function seances()
+    {
+        return $this->hasMany(Seance::class);
     }
 
-    public function getDureeSemainesAttribute()
+    public function documents()
     {
-        if ($this->semaine_debut && $this->semaine_fin) {
-            return $this->semaine_fin - $this->semaine_debut + 1;
-        }
-        return 16;
+        return $this->hasMany(Document::class);
+    }
+
+    public function annonces()
+    {
+        return $this->hasMany(Annonce::class);
     }
 }

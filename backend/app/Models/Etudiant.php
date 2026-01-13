@@ -2,29 +2,34 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Etudiant extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'cne',
-        'niveau',
-        'groupe_id',
-        'user_id'
+        'cne', 'niveau', 'id_groupe', 'utilisateur_id'
     ];
 
-    // Relation avec l'utilisateur
-    public function user()
+    public function utilisateur()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Utilisateur::class);
     }
-
-    // Relation avec le groupe
+    public function modules(): BelongsToMany
+{
+    return $this->belongsToMany(
+        Module::class,
+        'module_etudiant',
+        'etudiant_id',
+        'module_id'
+    );
+}
     public function groupe()
     {
-        return $this->belongsTo(Groupe::class);
+        return $this->belongsTo(Groupe::class, 'id_groupe');
+    }
+
+    public function presences()
+    {
+        return $this->hasMany(Presence::class);
     }
 }
