@@ -2,24 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Enseignant extends Model
 {
-    protected $table = 'enseignants'; // optionnel si le nom suit la convention
+    use HasFactory;
 
+    protected $table = 'enseignants';
+    
     protected $fillable = [
-        'user_id',
         'nom',
         'email',
         'specialite',
         'statut',
-        'heures_max_semaine'
+        'heures_max_semaine',
+        'telephone',
+        'user_id'
     ];
-
-    // Relation vers l'utilisateur
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
+    
+    protected $casts = [
+        'heures_max_semaine' => 'integer'
+    ];
 }
