@@ -57,7 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/modules', [ModuleController::class, 'store']);
 
     // Séances
-    Route::post('/seances', [SeanceController::class, 'store']);
+    Route::post('/seances', [SeanceController::class, 'store']); // Pour le QR Code
+    Route::post('/seances/creer', [PresenceController::class, 'creerSeance']); // Pour la Reconnaissance Faciale
     Route::get('/seances/{id}/qrcode', [SeanceController::class, 'genererQRCode']);
 
     // Annonces (enseignants uniquement)
@@ -71,6 +72,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Présences
     Route::post('/presences', [PresenceController::class, 'enregistrerPresence']);
-    Route::post('/presences/face-recognition', [PresenceController::class, 'faceRecognition']);
+    
+    // Route cruciale pour envoyer l'image caméra vers l'IA via le PresenceController
+    Route::post('/presence/face-recognition', [PresenceController::class, 'faceRecognition']);
+    
     Route::get('/teacher/etudiants-presence', [PresenceController::class, 'getEtudiantsPresence']);
+    
 });
