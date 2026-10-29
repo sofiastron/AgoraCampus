@@ -6,8 +6,8 @@ AgoraCampus is a university web platform that brings academic information and st
 
 ```text
 AgoraCampus/
-â”œâ”€â”€ frontend/    # Vue 3 single-page application
-â””â”€â”€ backend/     # Laravel REST API
+           frontend/    # Vue 3 single-page application
+           backend/     # Laravel REST API
 ```
 
 ## Technology stack
