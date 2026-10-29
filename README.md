@@ -90,3 +90,7 @@ Authenticated routes use Laravel Sanctum.
 
 Do not commit `.env`, generated dependencies, API keys, or local database credentials. Use `.env.example` as the starting point for local configuration.
 
+## Documentation
+
+For architecture, local setup details, API and QA guidance, see [Development & QA Documentation](docs/DEVELOPMENT_AND_QA.md).
+
